@@ -1,0 +1,14 @@
+.crown-2 {
+    position: absolute;
+    top: -28px;  /* Moves it above the 'e' */
+    .crown-2 {
+      position: absolute;
+      top: 5px;  /* Moves it above the 'e' */
+      left: -8px; /* Adjusts position to align with 'e' */
+      font-size: 1.2em;
+      transform: rotate(-20deg); /* Slight tilt for a natural look */
+    }
+    /* Adjusts position to align with 'e' */
+    font-size: 1.2em;
+    transform: rotate(-10deg); /* Slight tilt for a natural look */
+  }

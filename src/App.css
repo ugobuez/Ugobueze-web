@@ -1,38 +1,160 @@
-.App {
+
+.glass{
+  background-color: rgba(249, 248, 248, 0.5) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+}
+.crown {
+  position: absolute;
+  top: -18px;  /* Moves it above the 'e' */
+  .crown {
+    position: absolute;
+    top: 5px;  /* Moves it above the 'e' */
+    left: -8px; /* Adjusts position to align with 'e' */
+    font-size: 1.2em;
+    transform: rotate(-20deg); /* Slight tilt for a natural look */
+  }
+  /* Adjusts position to align with 'e' */
+  font-size: 1.2em;
+  transform: rotate(-10deg); /* Slight tilt for a natural look */
+}
+
+.btn-gin{
+  background-color: rgb(3, 252, 198) !important;
+  color: black;
+  
+  font-weight: bold !important;
+}
+.move{
+  margin-left: 150px !important;
+}
+.create{
+  background-color: rgb(3, 252, 198) !important;
+  color: black;
+}
+
+.dashboard-container {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   text-align: center;
+  font-family: "Arial", sans-serif;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.dashboard-card {
+  padding: 20px;
+  background: white;
+  border-radius: 10px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.dashboard-header h2 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+.congratulations-banner {
+  background: linear-gradient(135deg, #ff8c00, #ff4500);
   color: white;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 10px;
 }
 
-.App-link {
-  color: #61dafb;
+.balance-section {
+  margin: 20px 0;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+.balance-card {
+  background: #007bff;
+  color: white;
+  padding: 15px;
+  border-radius: 8px;
+  font-size: 18px;
+}
+
+.sell-gift-card-btn {
+  width: 100%;
+  padding: 10px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 15px;
+}
+
+.sell-gift-card-btn:hover {
+  background-color: #218838;
+}
+
+.features-section {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  margin: 15px 0;
+}
+
+.feature-item {
+  background: #f1f1f1;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  margin: 5px;
+  flex: 1;
+  text-align: center;
+  min-width: 120px;
+}
+
+.recent-transactions {
+  background: #e3f2fd;
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 15px;
+}
+
+.hot-cards {
+  margin-top: 20px;
+}
+
+.card-item {
+  background: #ffc107;
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 5px;
+}
+
+.bottom-nav {
+  display: flex;
+  justify-content: space-around;
+  background: #343a40;
+  padding: 10px;
+  border-radius: 8px;
+  margin-top: 15px;
+}
+
+.bottom-nav a {
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+}
+.fast{
+  margin-left: 80px ;
+}
+.upto{
+  background: #f1f1f1;
+}
+
+@media screen and (max-width: 600px) {
+  .move{
+    margin-left: 0px !important;
   }
-  to {
-    transform: rotate(360deg);
+  .flex-row{
+    flex-direction: column;
   }
+  
 }
