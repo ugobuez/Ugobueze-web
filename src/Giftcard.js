@@ -6,7 +6,7 @@ export default function GiftCards() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("http://localhost:3500/api/giftcards", {
+    fetch("https://ugobueze-app.onrender.com/api/giftcards", {
       headers: {
         "Authorization": `Bearer ${localStorage.getItem("token")}`, // ✅ Ensure user is logged in
       }

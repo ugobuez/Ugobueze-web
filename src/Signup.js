@@ -20,7 +20,7 @@ const SignupForm = () => {
     }
 
     try {
-      await axios.post("http://localhost:3500/api/user", {
+      await axios.post("https://ugobueze-app.onrender.com/api/user", {
         name: "User",
         email: formData.email,
         password: formData.password,

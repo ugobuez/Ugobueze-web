@@ -15,7 +15,7 @@ import AdminLogin from "./Admin";
 
 const App = () => {
   const location = useLocation();
-  const hideHeaderRoutes = ["/login", "/signup", "/dashboard"];
+  const hideHeaderRoutes = ["/login", "/signup", "/dashboard", "/admin/dashboard"];
 
   return (
     <div>

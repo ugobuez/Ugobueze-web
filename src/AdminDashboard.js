@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
+import AdminGiftCardManagement from "./AdminRedeem";
 
 const AdminDashboard = () => {
   const [redemptions, setRedemptions] = useState([]);
@@ -20,7 +21,7 @@ const AdminDashboard = () => {
       }
 
       try {
-        const response = await axios.get("http://localhost:3500/api/admin/redemptions", {
+        const response = await axios.get("https://ugobueze-app.onrender.com/api/admin/redemptions", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setRedemptions(response.data);
@@ -51,13 +52,13 @@ const AdminDashboard = () => {
   // Handle status change (accept or reject)
   const handleStatusChange = async (redemptionId, action, rejectReason = "") => {
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("adminToken");
       if (!token) {
         setError("Please log in as an admin to perform this action");
         return;
       }
 
-      const url = `http://localhost:3500/api/admin/redemptions/${redemptionId}/${action}`;
+      const url = `https://ugobueze-app.onrender.com/api/admin/redemptions/${redemptionId}/${action}`;
       const config = {
         headers: { Authorization: `Bearer ${token}` },
         data: action === "reject" ? { reason: rejectReason } : {},
@@ -87,7 +88,7 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="container mt-5">
+    <div className="container mt-5 ">
       <h2>Admin Dashboard - Redemptions</h2>
       {error && <p className="text-danger">{error}</p>}
       {isLoading && <p>Loading redemptions...</p>}
@@ -159,6 +160,7 @@ const AdminDashboard = () => {
           ))}
         </tbody>
       </table>
+      <AdminGiftCardManagement/>
     </div>
   );
 };

@@ -13,7 +13,7 @@ export default function GiftCardDetails() {
 
   // Fetch gift card details by ID
   useEffect(() => {
-    fetch(`http://localhost:3500/api/giftcards/${id}`, {
+    fetch(`https://ugobueze-app.onrender.com/api/giftcards/${id}`, {
       headers: {
         "Authorization": `Bearer ${localStorage.getItem("token")}`, // Ensure API is authenticated
       }
@@ -51,7 +51,7 @@ export default function GiftCardDetails() {
             return;
         }
 
-        const response = await fetch(`http://localhost:3500/api/giftcards/${id}/redeem`, {
+        const response = await fetch(`https://ugobueze-app.onrender.com/api/giftcards/${id}/redeem`, {
             method: "POST",
             body: formData,
             headers: {
@@ -109,7 +109,7 @@ export default function GiftCards() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("http://localhost:3500/api/giftcards", {
+    fetch("https://ugobueze-app.onrender.com/api/giftcards", {
       headers: {
         "Authorization": `Bearer ${localStorage.getItem("token")}`, // ✅ Ensure user is logged in
       }

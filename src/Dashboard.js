@@ -28,7 +28,7 @@ const Dashboard = () => {
     for (let attempt = 1; attempt <= retryCount; attempt++) {
       try {
         console.log(`Fetching balance (attempt ${attempt})...`);
-        const res = await fetch("http://localhost:3500/api/user/me", {
+        const res = await fetch("https://ugobueze-app.onrender.com/api/user/me", {
           headers: {
             Authorization: `Bearer ${token}`,
           },

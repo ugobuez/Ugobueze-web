@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import "./index.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 export default function GiftCardDetails() {
@@ -11,105 +10,74 @@ export default function GiftCardDetails() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Fetch gift card details by ID
   useEffect(() => {
-    fetch(`http://localhost:3500/api/giftcards/${id}`, {
+    fetch(`https://ugobueze-app.onrender.com/api/giftcards/${id}`, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        Authorization: `Bearer ${localStorage.getItem("userToken")}`,
       },
     })
       .then((res) => res.json())
       .then((data) => setGiftCard(data))
       .catch((error) => {
-        console.error("Error fetching gift card details:", error);
-        setError("Failed to load gift card details. Please try again.");
+        setError("Failed to load gift card details");
       });
   }, [id]);
 
-  // Handle image upload
+  // Add this missing function
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
-    if (file && file.size > 5 * 1024 * 1024) {
-      setError("Image file too large. Please upload an image smaller than 5MB.");
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      setError("Image file too large (max 5MB)");
       setImage(null);
       return;
     }
+    
     setImage(file);
+    setError("");
   };
 
-  // Handle the form submission for redemption
   const handleSubmit = async (event) => {
     event.preventDefault();
-
-    if (!amount || amount <= 0) {
-      setError("Please enter a valid amount greater than zero.");
-      return;
-    }
-
-    if (!image) {
-      setError("Please upload an image.");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("amount", amount.toString());
-    formData.append("image", image);
-
-    console.log("Submitting form data:", { amount, image: image.name });
-
     setLoading(true);
     setError("");
 
+    const formData = new FormData();
+    formData.append("amount", amount);
+    formData.append("image", image);
+
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("userToken");
       if (!token) {
-        setError("You must be logged in to redeem a gift card.");
+        setError("Authentication required");
         return;
       }
 
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000);
-
-      const response = await fetch(`http://localhost:3500/api/giftcards/${id}/redeem`, {
+      const response = await fetch(`https://ugobueze-app.onrender.com/api/giftcards/${id}/redeem`, {
         method: "POST",
         body: formData,
         headers: {
           Authorization: `Bearer ${token}`,
         },
-        signal: controller.signal,
       });
 
-      clearTimeout(timeoutId);
-
-      const result = await response.json();
-      console.log("Backend response:", result); // Log response for debugging
-
+      const data = await response.json();
       if (response.ok) {
-        alert("Redemption request submitted successfully!");
+        alert("Redemption submitted!");
         setAmount("");
         setImage(null);
-        document.querySelector('input[type="file"]').value = "";
       } else {
-        setError(
-          response.status === 400 && result.error.includes("Validation failed")
-            ? "Invalid redemption data. Please check your input."
-            : result.error || "Something went wrong"
-        );
+        setError(data.error || "Redemption failed");
       }
-    } catch (error) {
-      console.error("Submission error:", error);
-      if (error.name === "AbortError") {
-        setError("Request timed out. Please try a smaller image.");
-      } else {
-        setError(`Error submitting redemption request: ${error.message}`);
-      }
+    } catch (err) {
+      setError("Network error. Try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  // Show loading message if giftCard is not yet fetched
-  if (!giftCard) return <p className="text-center mt-5">{error || "Loading..."}</p>;
+  if (!giftCard) return <div className="text-center mt-5">Loading...</div>;
 
   return (
     <div className="container mt-5">

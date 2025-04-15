@@ -15,7 +15,7 @@ const Login = () => {
     setError(null);
 
     try {
-      const response = await fetch("http://localhost:3500/api/auth/loginnow", {
+      const response = await fetch("https://ugobueze-app.onrender.com/api/auth/loginnow", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
