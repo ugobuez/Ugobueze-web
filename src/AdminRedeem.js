@@ -167,9 +167,10 @@ const AdminGiftCardManagement = () => {
                 value={formData.currency}
                 onChange={handleInputChange}
               >
+                <option value="NGN">NGN</option>
                 <option value="USD">USD</option>
                 <option value="EUR">EUR</option>
-                <option value="GBP">GBP</option>
+               
               </Form.Select>
             </Form.Group>
 
