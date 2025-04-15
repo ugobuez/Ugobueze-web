@@ -11,11 +11,12 @@ import GiftCards from "./Giftcard";
 import GiftCardDetails from "./GiftCardDetails";
 import AdminDashboard from "./AdminDashboard";
 import AdminLogin from "./Admin";
+import Sellgiftcard from "./Sellgiftcard"
 
 
 const App = () => {
   const location = useLocation();
-  const hideHeaderRoutes = ["/login", "/signup", "/dashboard", "/admin/dashboard"];
+  const hideHeaderRoutes = ["/login", "/signup", "/dashboard", "/admin/dashboard", "/Hot"];
 
   return (
     <div>
@@ -28,6 +29,8 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/" element={<GiftCards />} />
+        <Route path="/Hot" element={<Sellgiftcard />} />
+       
         <Route path="/giftcard/:id" element={<GiftCardDetails />} />
         <Route path='/admin/login' element={<AdminLogin/>}/>
 

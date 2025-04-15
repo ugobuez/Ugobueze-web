@@ -91,8 +91,8 @@ const Dashboard = () => {
             </button>
           </div>
         </div>
+        <Link to="/Hot">  <button className="sell-gift-card-btn">Sell Gift Card</button></Link>
 
-        <button className="sell-gift-card-btn">Sell Gift Card</button>
 
         <div className="features-section">
           <div className="feature-item">💰 Referral program</div>
