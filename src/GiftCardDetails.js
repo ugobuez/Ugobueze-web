@@ -18,7 +18,7 @@ const GiftCardDetails = () => {
   useEffect(() => {
     const fetchGiftCard = async () => {
       try {
-        const response = await fetch(`https://ugobueze-app.onrender.com/api/giftcards/${id}`);
+        const response = await fetch(`http://localhost:4500/api/giftcards/${id}`);
         if (!response.ok) throw new Error("Gift card not found");
         const data = await response.json();
         setGiftCard(data);
@@ -39,7 +39,9 @@ const GiftCardDetails = () => {
       return;
     }
 
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token") || localStorage.getItem("userToken");
+    console.log("TOKEN FOUND:", token); // DEBUG
+
     if (!token) {
       setError("Authentication token missing. Please log in again.");
       return;
@@ -51,7 +53,7 @@ const GiftCardDetails = () => {
 
     setLoading(true);
     try {
-      const response = await fetch(`https://ugobueze-app.onrender.com/api/giftcards/${id}/redeem`, {
+      const response = await fetch(`http://localhost:4500/api/giftcards/${id}/redeem`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -62,22 +64,25 @@ const GiftCardDetails = () => {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || "Failed to submit redemption.");
+        console.error("❌ Backend error response:", result);
+        throw new Error(result.error || result.message || "Failed to submit redemption.");
       }
 
       setMessage(result.message || "Gift card submitted for review.");
       setError("");
+      setAmount("");
+      setImage(null);
     } catch (err) {
       console.error("Submit error:", err);
-      setError(err.message);
+      setError(err.message || "An error occurred during submission.");
       setMessage("");
     } finally {
       setLoading(false);
     }
   };
 
-  if (error && !giftCard) return <div>{error}</div>;
-  if (!giftCard) return <div>Loading...</div>;
+  if (error && !giftCard) return <div className="container mt-5 text-danger">{error}</div>;
+  if (!giftCard) return <div className="container mt-5">Loading...</div>;
 
   return (
     <div className="container mt-5">

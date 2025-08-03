@@ -1,4 +1,3 @@
-// src/components/Login.js
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -33,10 +32,14 @@ const Login = () => {
         throw new Error(data?.error || "Login failed");
       }
 
+      // ✅ Store token under both keys
       localStorage.setItem("userToken", data.token);
+      localStorage.setItem("token", data.token);
+
       if (data.user?.referralCode) {
         localStorage.setItem("referralCode", data.user.referralCode);
       }
+
       console.log("✅ Stored userToken:", data.token);
       navigate("/dashboard");
     } catch (err) {

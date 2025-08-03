@@ -81,8 +81,8 @@ const Referrals = () => {
   if (error) return <div className="text-center mt-5 text-danger">{error}</div>;
 
   return (
-    <Container className="mt-5">
-      <h2 className="text-center fw-bold text-primary mt-4">Refer & Earn 💸</h2>
+    <Container className="mt-5 ">
+      <h1 className="text-center fw-bold text-primary mt-5 pt-5">Refer & Earn 💸</h1>
       <p className="text-center">Earn $3 when friends redeem a gift card using your link!</p>
 
       <div className="d-flex justify-content-center mb-4">
