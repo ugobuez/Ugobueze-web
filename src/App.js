@@ -11,8 +11,8 @@ import GiftCards from "./Giftcard";
 import GiftCardDetails from "./GiftCardDetails";
 import AdminDashboard from "./AdminDashboard";
 import AdminLogin from "./Admin";
-import Sellgiftcard from "./Sellgiftcard"
-
+import Sellgiftcard from "./Sellgiftcard";
+import Referrals from "./Referrals"; // ✅ Make sure this is a default export
 
 const App = () => {
   const location = useLocation();
@@ -28,12 +28,10 @@ const App = () => {
         <Route path="/authguard" element={<AuthGuard />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/" element={<GiftCards />} />
         <Route path="/Hot" element={<Sellgiftcard />} />
-       
+        <Route path="/referrals" element={<Referrals />} />
         <Route path="/giftcard/:id" element={<GiftCardDetails />} />
-        <Route path='/admin/login' element={<AdminLogin/>}/>
-
+        <Route path="/admin/login" element={<AdminLogin />} />
       </Routes>
     </div>
   );

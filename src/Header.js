@@ -20,23 +20,30 @@ const Header = () => {
               <i className="bx fs-3 bxs-user"></i> Login ➜
             </Button>
           </Link>
+
           <Link to="/admin/login">
             <Button variant="white" className="rounded-pill my-3 pt-2 px-4">
-              <i className="bx fs-3 "></i> Admin ➜
+              <i className="bx fs-3"></i> Admin ➜
             </Button>
-          </Link>   
+          </Link>
+
           <Link to="/dashboard">
             <Button variant="white" className="rounded-pill my-3 pt-2 px-4">
-              <i className="bx fs-3 "></i> Dashboard ➜
+              <i className="bx fs-3"></i> Dashboard ➜
             </Button>
-          </Link>   
+          </Link>
+
+          <Link to="/referrals">
+            <Button variant="white" className="rounded-pill my-3 pt-2 px-4">
+              <i className="bx fs-3 bx-gift"></i> Referrals ➜
+            </Button>
+          </Link>
 
           <Link to="/admin/dashboard">
             <Button variant="white" className="rounded-pill my-3 pt-2 px-4">
-              <i className="bx fs-3 "></i> admin Dashboard ➜
+              <i className="bx fs-3"></i> Admin Dashboard ➜
             </Button>
-          </Link>  
-            
+          </Link>
         </Nav>
       </Navbar.Collapse>
     </Navbar>

@@ -1,64 +1,122 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Link, useNavigate } from "react-router-dom";
 import { Navbar } from "react-bootstrap";
 import "./Crown.css";
-import GiftCard from "./Giftcard";
 
-const Dashboard = () => {
-  
-  const [balance, setBalance] = useState(0);
-  const [loading, setLoading] = useState(false);
+const BASE_URL = "https://ugobueze-app.onrender.com"; // Consistent base URL
+
+const GiftCard = () => {
+  const [giftCards, setGiftCards] = useState([]);
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const fetchUserData = async (retryCount = 3) => {
-    const token = localStorage.getItem("userToken");
-    if (!token) {
-      setError("Please log in to view your balance");
-      setLoading(false);
-      console.error("No userToken found in localStorage");
-      navigate("/login");
-      return;
-    }
-
-    setLoading(true);
-    setError("");
-
-    for (let attempt = 1; attempt <= retryCount; attempt++) {
+  useEffect(() => {
+    const fetchGiftCards = async () => {
       try {
-        console.log(`Fetching balance (attempt ${attempt})...`);
-        const res = await fetch("https://ugobueze-app.onrender.com/api/user/me", {
+        const token = localStorage.getItem("userToken");
+        if (!token) {
+          setError("Authentication token missing. Please log in.");
+          return;
+        }
+
+        const res = await fetch(`${BASE_URL}/api/giftcards`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
 
-        if (!res.ok) {
-          throw new Error(`HTTP error ${res.status}: ${res.statusText}`);
-        }
-
+        if (!res.ok) throw new Error("Failed to fetch gift cards.");
         const data = await res.json();
-        console.log("Fetch response:", data);
-        setBalance(data.balance || 0);
-        setLoading(false);
-        return;
+        if (!Array.isArray(data)) throw new Error("Invalid data format");
+
+        setGiftCards(data);
       } catch (err) {
-        console.error(`Fetch attempt ${attempt} failed:`, err.message);
-        if (attempt === retryCount) {
-          setError("Unable to load balance. Please try again or re-login.");
-          setLoading(false);
-        }
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        console.error(err);
+        setError("Could not load gift cards.");
       }
+    };
+
+    fetchGiftCards();
+  }, []);
+
+  if (error) return <p className="text-danger">{error}</p>;
+
+  return (
+    <div className="row">
+      {giftCards.map((card) => (
+        <div className="col-6 mb-3" key={card._id} onClick={() => navigate(`/giftcard/${card._id}`)}>
+          <div className="card shadow-sm" style={{ cursor: "pointer" }}>
+            <img
+              src={card.image}
+              alt={card.name}
+              className="card-img-top"
+              style={{ height: "120px", objectFit: "cover" }}
+            />
+            <div className="card-body text-center">
+              <h6 className="card-title">{card.name}</h6>
+              <div className="d-flex justify-content-center align-items-center text-muted">
+                <p className="mb-0">UP TO </p>
+                <p className="mb-0 px-2">₦{card.value}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const Dashboard = () => {
+  const [balance, setBalance] = useState(0);
+  const [referralCode, setReferralCode] = useState("");
+  const [referralCount, setReferralCount] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+
+  const fetchUserData = useCallback(async (attempt = 1, maxAttempts = 3) => {
+    const token = localStorage.getItem("userToken");
+    if (!token) {
+      setError("Please log in to view your balance");
+      navigate("/login");
+      return;
     }
-  };
+
+    try {
+      setLoading(true);
+      console.log(`Fetching balance (attempt ${attempt})...`);
+      const res = await fetch(`${BASE_URL}/api/users/me`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData?.error || `HTTP error ${res.status}: ${res.statusText}`);
+      }
+
+      const data = await res.json();
+      setBalance(data.balance || 0);
+      setReferralCode(data.referralCode || "");
+      setReferralCount(data.referredCount || 0);
+    } catch (err) {
+      console.error(`Fetch attempt ${attempt} failed:`, err.message);
+      if (attempt < maxAttempts) {
+        // Retry after a short delay
+        setTimeout(() => fetchUserData(attempt + 1, maxAttempts), 1000);
+      } else {
+        setError(err.message || "Failed to load user data after multiple attempts.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [navigate]);
 
   useEffect(() => {
     fetchUserData();
-    // no need to add fetchUserData to deps since it's defined inside the component and doesn't depend on external variables
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [fetchUserData]);
 
   return (
     <div className="dashboard-container">
@@ -77,22 +135,29 @@ const Dashboard = () => {
         <div className="balance-section">
           <p>📢 Minimum withdrawal amount will be improved</p>
           <div className="balance-card">
-          
             <p>Naira Balance</p>
-            <h3> $ {balance.toLocaleString("en-NG", { minimumFractionDigits: 2 })}</h3>
+            <h3>₦{balance.toLocaleString("en-NG", { minimumFractionDigits: 2 })}</h3>
+            {referralCode && (
+              <>
+                <p><strong>Referral Code:</strong> <code>{referralCode}</code></p>
+                <p><strong>Total Referrals:</strong> {referralCount}</p>
+              </>
+            )}
             {loading && <p>Loading balance...</p>}
             {error && <p className="text-danger">{error}</p>}
             <button
               className="btn btn-secondary btn-sm mt-2"
-              onClick={() => fetchUserData()}
+              onClick={() => fetchUserData(1)}
               disabled={loading}
             >
               {loading ? "Refreshing..." : "Refresh Balance"}
             </button>
           </div>
         </div>
-        <Link to="/Hot">  <button className="sell-gift-card-btn">Sell Gift Card</button></Link>
 
+        <Link to="/Hot">
+          <button className="sell-gift-card-btn">Sell Gift Card</button>
+        </Link>
 
         <div className="features-section">
           <div className="feature-item">💰 Referral program</div>

@@ -2,82 +2,82 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-export default function GiftCardDetails() {
+const GiftCardDetails = () => {
   const { id } = useParams();
   const [giftCard, setGiftCard] = useState(null);
   const [amount, setAmount] = useState("");
   const [image, setImage] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    fetch(`https://ugobueze-app.onrender.com/api/giftcards/${id}`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("userToken")}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => setGiftCard(data))
-      .catch((error) => {
-        setError("Failed to load gift card details");
-      });
-  }, [id]);
-
-  // Add this missing function
-  const handleImageUpload = (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    if (file.size > 5 * 1024 * 1024) {
-      setError("Image file too large (max 5MB)");
-      setImage(null);
-      return;
-    }
-    
-    setImage(file);
-    setError("");
+  const handleImageUpload = (e) => {
+    setImage(e.target.files[0]);
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    setLoading(true);
-    setError("");
+  useEffect(() => {
+    const fetchGiftCard = async () => {
+      try {
+        const response = await fetch(`https://ugobueze-app.onrender.com/api/giftcards/${id}`);
+        if (!response.ok) throw new Error("Gift card not found");
+        const data = await response.json();
+        setGiftCard(data);
+      } catch (err) {
+        console.error(err);
+        setError("Failed to fetch gift card.");
+      }
+    };
+
+    fetchGiftCard();
+  }, [id]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!amount || !image) {
+      setError("Please provide amount and image.");
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setError("Authentication token missing. Please log in again.");
+      return;
+    }
 
     const formData = new FormData();
-    formData.append("amount", amount);
+    formData.append("amount", amount.toString());
     formData.append("image", image);
 
+    setLoading(true);
     try {
-      const token = localStorage.getItem("userToken");
-      if (!token) {
-        setError("Authentication required");
-        return;
-      }
-
       const response = await fetch(`https://ugobueze-app.onrender.com/api/giftcards/${id}/redeem`, {
         method: "POST",
-        body: formData,
         headers: {
           Authorization: `Bearer ${token}`,
         },
+        body: formData,
       });
 
-      const data = await response.json();
-      if (response.ok) {
-        alert("Redemption submitted!");
-        setAmount("");
-        setImage(null);
-      } else {
-        setError(data.error || "Redemption failed");
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to submit redemption.");
       }
+
+      setMessage(result.message || "Gift card submitted for review.");
+      setError("");
     } catch (err) {
-      setError("Network error. Try again.");
+      console.error("Submit error:", err);
+      setError(err.message);
+      setMessage("");
     } finally {
       setLoading(false);
     }
   };
 
-  if (!giftCard) return <div className="text-center mt-5">Loading...</div>;
+  if (error && !giftCard) return <div>{error}</div>;
+  if (!giftCard) return <div>Loading...</div>;
 
   return (
     <div className="container mt-5">
@@ -87,7 +87,6 @@ export default function GiftCardDetails() {
           src={giftCard.image}
           alt={giftCard.name}
           className="img-fluid rounded mx-auto d-block"
-          style={{ maxWidth: "100%" }}
         />
 
         <form onSubmit={handleSubmit} className="mt-3">
@@ -119,6 +118,7 @@ export default function GiftCardDetails() {
           </div>
 
           {error && <p className="text-danger">{error}</p>}
+          {message && <p className="text-success">{message}</p>}
 
           <button type="submit" className="btn btn-primary w-100" disabled={loading}>
             {loading ? "Submitting..." : "Submit Redemption"}
@@ -127,4 +127,6 @@ export default function GiftCardDetails() {
       </div>
     </div>
   );
-}
+};
+
+export default GiftCardDetails;
