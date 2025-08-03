@@ -1,45 +1,75 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
+import { Link, useNavigate } from "react-router-dom";
 
-export default function GiftCards() {
+const BASE_URL = "https://ugobueze-app.onrender.com";
+
+const GiftCard = () => {
   const [giftCards, setGiftCards] = useState([]);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("https://ugobueze-app.onrender.com/api/giftcards", {
-      headers: {
-        "Authorization": `Bearer ${localStorage.getItem("token")}`, // ✅ Ensure user is logged in
+    const fetchGiftCards = async () => {
+      try {
+        const token = localStorage.getItem("userToken");
+        if (!token) {
+          setError("Authentication token missing. Please log in.");
+          navigate("/login");
+          return;
+        }
+
+        const res = await fetch(`${BASE_URL}/api/giftcards`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.message || `HTTP error ${res.status}`);
+        }
+
+        const data = await res.json();
+        if (!data.success || !Array.isArray(data.data)) {
+          throw new Error("Invalid data format");
+        }
+
+        setGiftCards(data.data);
+      } catch (err) {
+        console.error(err);
+        setError("Could not load gift cards: " + err.message);
       }
-    })
-      .then((res) => res.json())
-      .then((data) => setGiftCards(data))
-      .catch((error) => console.error("Error fetching gift cards:", error));
-  }, []);
+    };
+
+    fetchGiftCards();
+  }, [navigate]);
+
+  if (error) return <p className="text-danger">{error}</p>;
 
   return (
-    <div>
-      <div style={{ display: "flex", flexWrap: "wrap" }}>
-        {giftCards.map((card) => (
-          <div
-            key={card._id}
-            style={{ margin: "8px", textAlign: "center", cursor: "pointer" }}
-            onClick={() => navigate(`/giftcard/${card._id}`)}
-          >
-            <div className="d-flex my-2"> {/* ✅ Fixed `class` → `className` */}
-              <img
-                src={card.image}
-                alt={card.name}
-                style={{ width: "100px", height: "50px", objectFit: "cover" }}
-              />
-              <h6 className="mx-1">{card.name}</h6>
-            </div>
-            <div className="d-flex text-center w-100 justify-content-center upto rounded">
-              <p className="text-muted">UP TO </p>
-              <p className="px-2">₦{card.value}</p>
+    <div className="row">
+      {giftCards.map((card) => (
+        <div className="col-6 mb-3" key={card._id} onClick={() => navigate(`/giftcard/${card._id}`)}>
+          <div className="card shadow-sm" style={{ cursor: "pointer" }}>
+            <img
+              src={card.image}
+              alt={card.name}
+              className="card-img-top"
+              style={{ height: "120px", objectFit: "cover" }}
+            />
+            <div className="card-body text-center">
+              <h6 className="card-title">{card.name}</h6>
+              <div className="d-flex justify-content-center align-items-center text-muted">
+                <p className="mb-0">UP TO </p>
+                <p className="mb-0 px-2">₦{card.value}</p>
+              </div>
             </div>
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
     </div>
   );
-}
+};
+
+export default GiftCard;
