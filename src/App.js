@@ -7,7 +7,6 @@ import "./App.css";
 import Signup from "./Signup";
 import Dashboard from "./Dashboard";
 import AuthGuard from "./AuthGuard";
-import GiftCards from "./Giftcard";
 import GiftCardDetails from "./GiftCardDetails";
 import AdminDashboard from "./AdminDashboard";
 import AdminLogin from "./Admin";
