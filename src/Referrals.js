@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Card, Button, Image, Table, Badge, Alert } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'boxicons/css/boxicons.min.css';
-import { BASE_URL } from './config'; // Adjust to '../config' if in src/components/
+import { BASE_URL } from './config';
 
 const Referrals = () => {
   const [user, setUser] = useState(null);
@@ -21,7 +21,6 @@ const Referrals = () => {
 
     const fetchUserStats = async () => {
       try {
-        // Fetch logged-in user
         const resUser = await fetch(`${BASE_URL}/api/users/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -32,9 +31,6 @@ const Referrals = () => {
         }
 
         const userData = await resUser.json();
-        console.log('User data response:', userData); // Log for debugging
-
-        // Fetch stats by referral code
         const resStats = await fetch(`${BASE_URL}/api/referrals/stats/${userData.referralCode || ''}`);
         if (!resStats.ok) {
           const errorData = await resStats.json();
@@ -75,7 +71,7 @@ const Referrals = () => {
 
   const handleCopy = () => {
     if (!user?.referralCode) return;
-    const link = `${BASE_URL}/signup?code=${user.referralCode}`;
+    const link = `https://ugobueze-web.vercel.app/signup?code=${user.referralCode}`;
     navigator.clipboard.writeText(link);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -86,7 +82,7 @@ const Referrals = () => {
 
   return (
     <Container className="mt-5">
-      <h2 className="text-center fw-bold text-primary mb-3">Refer & Earn 💸</h2>
+      <h2 className="text-center fw-bold text-primary mt-4">Refer & Earn 💸</h2>
       <p className="text-center">Earn $3 when friends redeem a gift card using your link!</p>
 
       <div className="d-flex justify-content-center mb-4">
@@ -104,7 +100,7 @@ const Referrals = () => {
             <h6><strong>Your Referral Code:</strong> <Badge bg="success">{user.referralCode || 'N/A'}</Badge></h6>
             <p className="mt-2">
               <strong>Your Referral Link:</strong><br />
-              <code>{user.referralCode ? `${BASE_URL}/signup?code=${user.referralCode}` : 'N/A'}</code>
+              <code>{user.referralCode ? `https://ugobueze-web.vercel.app/signup?code=${user.referralCode}` : 'N/A'}</code>
             </p>
             <Button onClick={handleCopy} variant="outline-primary" className="me-2" disabled={!user?.referralCode}>
               {copied ? 'Copied!' : 'Copy'}
