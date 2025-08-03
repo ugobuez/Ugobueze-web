@@ -1,105 +1,149 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import axios from "axios";
-import { Form, InputGroup } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { Link } from 'react-router-dom';
+import 'boxicons/css/boxicons.min.css';
+import { BASE_URL } from './config'; // Adjust path if in src/
 
-const SignupForm = () => {
+const Signup = () => {
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    phone: "",
-    referredBy: "",
+    name: '',
+    email: '',
+    password: '',
+    referredBy: '',
   });
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Parse referral code from URL
   useEffect(() => {
-    const queryParams = new URLSearchParams(location.search);
-    const ref = queryParams.get("ref");
-    if (ref) {
-      setFormData((prev) => ({ ...prev, referredBy: ref }));
+    const params = new URLSearchParams(location.search);
+    const referralCode = params.get('code');
+    if (referralCode) {
+      setFormData((prev) => ({ ...prev, referredBy: referralCode }));
     }
-  }, [location.search]);
+  }, [location]);
 
-  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = (e) =>
+    setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleSignup = async (e) => {
     e.preventDefault();
     setError(null);
-
-    if (formData.password !== formData.confirmPassword) {
-      return setError("Passwords do not match");
-    }
+    setLoading(true);
 
     try {
-      // ✅ Corrected POST endpoint
-      await axios.post("https://ugobueze-app.onrender.com/api/users", {
-        name: formData.name,
-        email: formData.email,
-        password: formData.password,
-        phone: formData.phone,
-        referredBy: formData.referredBy || undefined,
+      const response = await fetch(`${BASE_URL}/api/users/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
       });
 
-      navigate("/login");
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.error || 'Signup failed');
+      }
+
+      localStorage.setItem('userToken', data.token);
+      localStorage.setItem('referralCode', data.referralCode || '');
+      console.log('✅ Stored userToken:', data.token);
+      navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data || "Signup failed");
+      console.error('Signup error:', err);
+      setError(err.message || 'An error occurred during signup');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="d-flex my-5 py-5 justify-content-center align-items-center vh-100">
-      <div className="card p-4 shadow-lg" style={{ maxWidth: "400px", width: "100%" }}>
+    <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
+      <div
+        className="card p-4 shadow"
+        style={{ width: '400px', background: 'rgba(255, 255, 255, 0.9)' }}
+      >
         <h1 className="text-center">👑</h1>
         <small className="mx-5 fs-6">
-          <i className='bx bx-check-shield fs-6 mx-1'></i>
+          <i className="bx bx-check-shield fs-6 mx-1"></i>
           Never resell your gift cards to third parties！
         </small>
+        <div className="rounded bg-dark text-white fast text-center w-50 p-1 my-1 mx-auto">
+          <small>Fast, Safety, Top Rates</small>
+        </div>
         <h4 className="text-center fs-2">SIGN UP</h4>
-        {error && <div className="alert alert-danger text-center">{error}</div>}
-        <Form onSubmit={handleSignup}>
-          <div className="py-3">
-            <small className="text-muted">Create a new account</small>
+        <small className="my-3 text-muted text-center d-block">
+          Create an account and start trading to make money right away
+        </small>
+
+        <form onSubmit={handleSignup}>
+          {error && <div className="alert alert-danger text-center">{error}</div>}
+          <div className="mb-3">
+            <label className="form-label">Name*</label>
+            <input
+              type="text"
+              name="name"
+              className="form-control"
+              placeholder="Enter your name"
+              required
+              value={formData.name}
+              onChange={handleChange}
+              disabled={loading}
+            />
           </div>
-          <Form.Group className="mb-3">
-            <Form.Label>Your Name*</Form.Label>
-            <Form.Control type="text" name="name" placeholder="Enter your name" required value={formData.name} onChange={handleChange} />
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>Your Email*</Form.Label>
-            <Form.Control type="email" name="email" placeholder="Enter your email" required value={formData.email} onChange={handleChange} />
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>Password*</Form.Label>
-            <Form.Control type="password" name="password" placeholder="Enter your password" required value={formData.password} onChange={handleChange} />
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>Confirm Password*</Form.Label>
-            <Form.Control type="password" name="confirmPassword" placeholder="Confirm password" required value={formData.confirmPassword} onChange={handleChange} />
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>Your Phone</Form.Label>
-            <InputGroup>
-              <InputGroup.Text>+234</InputGroup.Text>
-              <Form.Control type="tel" name="phone" placeholder="Phone Number (Optional)" value={formData.phone} onChange={handleChange} />
-            </InputGroup>
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>Referral Code</Form.Label>
-            <Form.Control type="text" name="referredBy" placeholder="Enter referral code (if any)" value={formData.referredBy} onChange={handleChange} />
-          </Form.Group>
-          <button type="submit" className="btn btn-dark w-100">Create Account</button>
-        </Form>
+          <div className="mb-3">
+            <label className="form-label">Email*</label>
+            <input
+              type="email"
+              name="email"
+              className="form-control"
+              placeholder="Enter your email"
+              required
+              value={formData.email}
+              onChange={handleChange}
+              disabled={loading}
+            />
+          </div>
+          <div className="mb-3">
+            <label className="form-label">Password*</label>
+            <input
+              type="password"
+              name="password"
+              className="form-control"
+              placeholder="Enter your password"
+              required
+              value={formData.password}
+              onChange={handleChange}
+              disabled={loading}
+            />
+          </div>
+          <div className="mb-3">
+            <label className="form-label">Referral Code (Optional)</label>
+            <input
+              type="text"
+              name="referredBy"
+              className="form-control"
+              placeholder="Enter referral code"
+              value={formData.referredBy}
+              onChange={handleChange}
+              disabled={loading}
+            />
+          </div>
+          <button type="submit" className="btn btn-dark w-100" disabled={loading}>
+            {loading ? 'Signing up...' : 'Sign Up'}
+          </button>
+        </form>
         <p className="text-center mt-3">
-          Already have an account? <Link to="/login" className="text-primary">Login</Link>
+          Already have an account?{' '}
+          <Link to="/login" className="text-primary">
+            Log in
+          </Link>
         </p>
       </div>
     </div>
   );
 };
 
-export default SignupForm;
+export default Signup;
