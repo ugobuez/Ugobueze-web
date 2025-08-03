@@ -18,7 +18,7 @@ const GiftCardDetails = () => {
   useEffect(() => {
     const fetchGiftCard = async () => {
       try {
-        const response = await fetch(`http://localhost:4500/api/giftcards/${id}`);
+        const response = await fetch(`https://ugobueze-app.onrender.com/api/giftcards/${id}`);
         if (!response.ok) throw new Error("Gift card not found");
         const data = await response.json();
         setGiftCard(data);
@@ -53,7 +53,7 @@ const GiftCardDetails = () => {
 
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:4500/api/giftcards/${id}/redeem`, {
+      const response = await fetch(`https://ugobueze-app.onrender.com/api/giftcards/${id}/redeem`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
