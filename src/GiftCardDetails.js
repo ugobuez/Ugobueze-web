@@ -21,9 +21,9 @@ const GiftCardDetails = () => {
         const response = await fetch(`https://ugobueze-app.onrender.com/api/giftcards/${id}`);
         if (!response.ok) throw new Error("Gift card not found");
         const data = await response.json();
-        setGiftCard(data);
+        setGiftCard(data.success ? data.data : data);
       } catch (err) {
-        console.error(err);
+        console.error("Fetch gift card error:", err);
         setError("Failed to fetch gift card.");
       }
     };
@@ -40,8 +40,6 @@ const GiftCardDetails = () => {
     }
 
     const token = localStorage.getItem("token") || localStorage.getItem("userToken");
-    console.log("TOKEN FOUND:", token); // DEBUG
-
     if (!token) {
       setError("Authentication token missing. Please log in again.");
       return;
@@ -57,6 +55,7 @@ const GiftCardDetails = () => {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
+          "x-api-key": "ugobtcapi_jwtPrivateKey"
         },
         body: formData,
       });
@@ -64,7 +63,7 @@ const GiftCardDetails = () => {
       const result = await response.json();
 
       if (!response.ok) {
-        console.error("❌ Backend error response:", result);
+        console.error("Backend error response:", result);
         throw new Error(result.error || result.message || "Failed to submit redemption.");
       }
 

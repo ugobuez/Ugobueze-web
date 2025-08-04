@@ -31,14 +31,15 @@ const GiftCard = () => {
         }
 
         const data = await res.json();
-        if (!data.success || !Array.isArray(data.data)) {
+        const cards = Array.isArray(data) ? data : (data.success && Array.isArray(data.data) ? data.data : []);
+        if (!cards.length && !Array.isArray(data)) {
           throw new Error("Invalid data format");
         }
 
-        setGiftCards(data.data);
+        setGiftCards(cards);
       } catch (err) {
-        console.error(err);
-        setError("Could not load gift cards: " + err.message);
+        console.error("GiftCard fetch error:", err);
+        setError(`Could not load gift cards: ${err.message}`);
       }
     };
 

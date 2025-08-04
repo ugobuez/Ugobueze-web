@@ -31,7 +31,12 @@ const Referrals = () => {
         }
 
         const userData = await resUser.json();
-        const resStats = await fetch(`${BASE_URL}/api/referrals/stats/${userData.referralCode || ''}`);
+
+        if (!userData.referralCode) {
+          throw new Error('Referral code not found for user.');
+        }
+
+        const resStats = await fetch(`${BASE_URL}/api/referrals/stats/${userData.referralCode}`);
         if (!resStats.ok) {
           const errorData = await resStats.json();
           throw new Error(errorData?.error || `Failed to fetch referral stats: ${resStats.status}`);
@@ -41,7 +46,7 @@ const Referrals = () => {
 
         setUser({
           name: userData.name || 'Unknown User',
-          referralCode: userData.referralCode || '',
+          referralCode: userData.referralCode,
           referralCount: stats.referralCount || 0,
           referralEarnings: stats.referralEarnings || 0,
         });
@@ -56,7 +61,10 @@ const Referrals = () => {
     const fetchLeaderboard = async () => {
       try {
         const res = await fetch(`${BASE_URL}/api/referrals/leaderboard`);
-        if (!res.ok) throw new Error('Failed to fetch leaderboard');
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData?.error || 'Failed to fetch leaderboard');
+        }
         const data = await res.json();
         setLeaderboard(data);
       } catch (err) {
@@ -81,7 +89,7 @@ const Referrals = () => {
   if (error) return <div className="text-center mt-5 text-danger">{error}</div>;
 
   return (
-    <Container className="mt-5 ">
+    <Container className="mt-5">
       <h1 className="text-center fw-bold text-primary mt-5 pt-5">Refer & Earn 💸</h1>
       <p className="text-center">Earn $3 when friends redeem a gift card using your link!</p>
 
@@ -97,27 +105,27 @@ const Referrals = () => {
         <Row>
           <Col md={6}>
             <h5><strong>Name:</strong> {user.name}</h5>
-            <h6><strong>Your Referral Code:</strong> <Badge bg="success">{user.referralCode || 'N/A'}</Badge></h6>
+            <h6><strong>Your Referral Code:</strong> <Badge bg="success">{user.referralCode}</Badge></h6>
             <p className="mt-2">
               <strong>Your Referral Link:</strong><br />
-              <code>{user.referralCode ? `https://ugobueze-web.vercel.app/signup?code=${user.referralCode}` : 'N/A'}</code>
+              <code>{`https://ugobueze-web.vercel.app/signup?code=${user.referralCode}`}</code>
             </p>
-            <Button onClick={handleCopy} variant="outline-primary" className="me-2" disabled={!user?.referralCode}>
+            <Button onClick={handleCopy} variant="outline-primary" className="me-2">
               {copied ? 'Copied!' : 'Copy'}
             </Button>
           </Col>
           <Col md={6}>
             <h5 className="mb-3">Your Stats</h5>
-            <p><strong>Referrals Made:</strong> {user.referralCount || 0}</p>
-            <p><strong>Total Earned:</strong> ${user.referralEarnings || 0}</p>
+            <p><strong>Referrals Made:</strong> {user.referralCount}</p>
+            <p><strong>Total Earned:</strong> ${user.referralEarnings}</p>
           </Col>
         </Row>
       </Card>
 
       <Alert variant="warning" className="text-center fw-bold">
         🎯 Contest Leaderboard: <Badge bg="warning" text="dark">Live</Badge><br />
-        Number of Referrals: <strong>{user.referralCount || 0}</strong><br />
-        Cash Earned: <strong>${user.referralEarnings || 0}</strong>
+        Number of Referrals: <strong>{user.referralCount}</strong><br />
+        Cash Earned: <strong>${user.referralEarnings}</strong>
       </Alert>
 
       <h4 className="mb-3">Referral Leaderboard</h4>

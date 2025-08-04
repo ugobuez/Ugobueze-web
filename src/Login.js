@@ -20,7 +20,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await fetch(`${BASE_URL}/api/auth/loginnow`, {
+      const response = await fetch(`${BASE_URL}/api/auth/loginNow`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),

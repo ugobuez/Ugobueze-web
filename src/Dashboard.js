@@ -3,69 +3,9 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { Link, useNavigate } from "react-router-dom";
 import { Navbar } from "react-bootstrap";
 import "./Crown.css";
+import GiftCard from "./Giftcard";
 
-const BASE_URL = "https://ugobueze-app.onrender.com"; // Consistent base URL
-
-const GiftCard = () => {
-  const [giftCards, setGiftCards] = useState([]);
-  const [error, setError] = useState("");
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const fetchGiftCards = async () => {
-      try {
-        const token = localStorage.getItem("userToken");
-        if (!token) {
-          setError("Authentication token missing. Please log in.");
-          return;
-        }
-
-        const res = await fetch(`${BASE_URL}/api/giftcards`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!res.ok) throw new Error("Failed to fetch gift cards.");
-        const data = await res.json();
-        if (!Array.isArray(data)) throw new Error("Invalid data format");
-
-        setGiftCards(data);
-      } catch (err) {
-        console.error(err);
-        setError("Could not load gift cards.");
-      }
-    };
-
-    fetchGiftCards();
-  }, []);
-
-  if (error) return <p className="text-danger">{error}</p>;
-
-  return (
-    <div className="row">
-      {giftCards.map((card) => (
-        <div className="col-6 mb-3" key={card._id} onClick={() => navigate(`/giftcard/${card._id}`)}>
-          <div className="card shadow-sm" style={{ cursor: "pointer" }}>
-            <img
-              src={card.image}
-              alt={card.name}
-              className="card-img-top"
-              style={{ height: "120px", objectFit: "cover" }}
-            />
-            <div className="card-body text-center">
-              <h6 className="card-title">{card.name}</h6>
-              <div className="d-flex justify-content-center align-items-center text-muted">
-                <p className="mb-0">UP TO </p>
-                <p className="mb-0 px-2">₦{card.value}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-};
+const BASE_URL = "https://ugobueze-app.onrender.com";
 
 const Dashboard = () => {
   const [balance, setBalance] = useState(0);
@@ -104,7 +44,6 @@ const Dashboard = () => {
     } catch (err) {
       console.error(`Fetch attempt ${attempt} failed:`, err.message);
       if (attempt < maxAttempts) {
-        // Retry after a short delay
         setTimeout(() => fetchUserData(attempt + 1, maxAttempts), 1000);
       } else {
         setError(err.message || "Failed to load user data after multiple attempts.");
