@@ -8,11 +8,17 @@ export default function GiftCards() {
   useEffect(() => {
     fetch("https://ugobueze-app.onrender.com/api/giftcards", {
       headers: {
-        "Authorization": `Bearer ${localStorage.getItem("token")}`,
+        "Authorization": `Bearer ${localStorage.getItem("userToken")}`, // use consistent token key
       }
     })
       .then((res) => res.json())
-      .then((data) => setGiftCards(data))
+      .then((data) => {
+        if (data.success && Array.isArray(data.data)) {
+          setGiftCards(data.data);
+        } else {
+          console.error("Unexpected response format:", data);
+        }
+      })
       .catch((error) => console.error("Error fetching gift cards:", error));
   }, []);
 
@@ -35,7 +41,7 @@ export default function GiftCards() {
       <section>
         <h5 style={{ fontWeight: 600 }}>Recently Sold Gift Cards</h5>
         <div className="w-50" style={{ display: "flex", gap: "1rem", marginBottom: "2rem" }}>
-          {giftCards.slice(0, 1).map((card) => (
+          {Array.isArray(giftCards) && giftCards.slice(0, 1).map((card) => (
             <div
               key={card._id}
               style={{
@@ -88,7 +94,7 @@ export default function GiftCards() {
             marginTop: "1rem"
           }}
         >
-          {giftCards.map((card) => (
+          {Array.isArray(giftCards) && giftCards.map((card) => (
             <div
               key={card._id}
               style={{
@@ -103,7 +109,13 @@ export default function GiftCards() {
               <img
                 src={card.image}
                 alt={card.name}
-                style={{ width: "75%", borderRadius: "12px", marginBottom: "0.5rem", height: "100px", objectFit: "cover" }}
+                style={{
+                  width: "75%",
+                  borderRadius: "12px",
+                  marginBottom: "0.5rem",
+                  height: "100px",
+                  objectFit: "cover"
+                }}
               />
               <p style={{ fontWeight: 500 }}>{card.name}</p>
               <div
