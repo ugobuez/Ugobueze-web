@@ -21,11 +21,6 @@ const Header = () => {
             </Button>
           </Link>
 
-          <Link to="/admin/login">
-            <Button variant="white" className="rounded-pill my-3 pt-2 px-4">
-              <i className="bx fs-3"></i> Admin ➜
-            </Button>
-          </Link>
 
           <Link to="/dashboard">
             <Button variant="white" className="rounded-pill my-3 pt-2 px-4">

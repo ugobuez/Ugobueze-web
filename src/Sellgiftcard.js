@@ -8,7 +8,7 @@ export default function GiftCards() {
   useEffect(() => {
     fetch("https://ugobueze-app.onrender.com/api/giftcards", {
       headers: {
-        "Authorization": `Bearer ${localStorage.getItem("userToken")}`, // use consistent token key
+        "Authorization": `Bearer ${localStorage.getItem("token")}`, // use consistent token key
       }
     })
       .then((res) => res.json())

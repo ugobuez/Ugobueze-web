@@ -3,6 +3,9 @@ import axios from 'axios';
 import { Modal, Button, Form, Alert, Table, Spinner } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
+// Centralize API base URL
+const API_BASE_URL = 'https://ugobueze-app.onrender.com/api';
+
 const AdminGiftCardManagement = () => {
   const [giftCards, setGiftCards] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -19,14 +22,14 @@ const AdminGiftCardManagement = () => {
 
   const fetchGiftCards = useCallback(async () => {
     try {
-      const token = localStorage.getItem('token'); // Changed to 'token'
+      const token = localStorage.getItem('token');
       if (!token) {
         setError('Please log in as an admin');
         navigate('/login');
         return;
       }
-      console.log('Using token:', token); // Debug token
-      const response = await axios.get('https://ugobueze-app.onrender.com', {
+      console.log('Using token:', token);
+      const response = await axios.get(`${API_BASE_URL}/giftcards`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setGiftCards(Array.isArray(response.data.data) ? response.data.data : response.data);
@@ -36,16 +39,18 @@ const AdminGiftCardManagement = () => {
         setError('Session expired or unauthorized. Please log in again.');
         localStorage.removeItem('token');
         navigate('/login');
+      } else if (err.response?.status === 404) {
+        setError('Gift card endpoint not found. Please contact support.');
       } else {
         setError(err.response?.data?.error || 'Failed to fetch gift cards');
       }
       setGiftCards([]);
     }
-  }, [navigate]); // Added navigate to dependencies
+  }, [navigate]);
 
   useEffect(() => {
     fetchGiftCards();
-  }, [fetchGiftCards]); // Added fetchGiftCards to dependency array
+  }, [fetchGiftCards]);
 
   const handleInputChange = (e) => {
     const { name, value, files } = e.target;
@@ -57,7 +62,6 @@ const AdminGiftCardManagement = () => {
           return;
         }
         if (file.size > 5 * 1024 * 1024) {
-          // 5MB limit
           setError('Image file size must be less than 5MB');
           return;
         }
@@ -72,7 +76,7 @@ const AdminGiftCardManagement = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const token = localStorage.getItem('token'); // Changed to 'token'
+      const token = localStorage.getItem('token');
       if (!token) {
         setError('Please log in as an admin');
         navigate('/login');
@@ -88,7 +92,7 @@ const AdminGiftCardManagement = () => {
         formDataToSend.append('image', formData.image);
       }
 
-      await axios.post('https://ugobueze-app.onrender.com/api/giftcards', formDataToSend, {
+      await axios.post(`${API_BASE_URL}/giftcards`, formDataToSend, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',
@@ -115,13 +119,13 @@ const AdminGiftCardManagement = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this gift card?')) {
       try {
-        const token = localStorage.getItem('token'); // Changed to 'token'
+        const token = localStorage.getItem('token');
         if (!token) {
           setError('Please log in as an admin');
           navigate('/login');
           return;
         }
-        await axios.delete(`https://ugobueze-app.onrender.com/api/giftcards/${id}`, {
+        await axios.delete(`${API_BASE_URL}/giftcards/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         fetchGiftCards();

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Link, useNavigate } from "react-router-dom";
+import {  useNavigate } from "react-router-dom";
 
 const BASE_URL = "https://ugobueze-app.onrender.com";
 
@@ -12,7 +12,7 @@ const GiftCard = () => {
   useEffect(() => {
     const fetchGiftCards = async () => {
       try {
-        const token = localStorage.getItem("userToken");
+        const token = localStorage.getItem("token");
         if (!token) {
           setError("Authentication token missing. Please log in.");
           navigate("/login");

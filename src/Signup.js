@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Link } from 'react-router-dom';
 import 'boxicons/css/boxicons.min.css';
-import { BASE_URL } from './config'; // Adjust path if in src/
+import { BASE_URL } from './config'; 
 
 const Signup = () => {
   const [formData, setFormData] = useState({

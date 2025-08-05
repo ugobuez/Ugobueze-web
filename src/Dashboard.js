@@ -16,7 +16,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   const fetchUserData = useCallback(async (attempt = 1, maxAttempts = 3) => {
-    const token = localStorage.getItem("userToken");
+    const token = localStorage.getItem("token");
     if (!token) {
       setError("Please log in to view your balance");
       navigate("/login");

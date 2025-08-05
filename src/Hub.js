@@ -164,7 +164,7 @@ export default function AdminDashboard() {
       return;
     }
 
-    fetch("http://localhost:3500/api/admin/redemptions", {
+    fetch("https://ugobueze-app.onrender.com/api/admin/redemptions", {
       headers: { "Authorization": "Bearer " + token },
     })
       .then((res) => {
@@ -189,7 +189,7 @@ export default function AdminDashboard() {
 
   const handleStatusChange = async (id, status) => {
     try {
-      const response = await fetch(`http://localhost:3500/api/admin/redemptions/${id}`, {
+      const response = await fetch(`https://ugobueze-app.onrender.com/api/admin/redemptions/${id}`, {
         method: "PUT",
         headers: { 
           "Content-Type": "application/json",

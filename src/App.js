@@ -8,7 +8,7 @@ import Signup from "./Signup";
 import Dashboard from "./Dashboard";
 import GiftCardDetails from "./GiftCardDetails";
 import AdminDashboard from "./AdminDashboard";
-import AdminLogin from "./Admin";
+
 import Sellgiftcard from "./Sellgiftcard";
 import Referrals from "./Referrals";
 
@@ -36,7 +36,7 @@ const App = () => {
         <Route path="/Hot" element={<Sellgiftcard />} />
         <Route path="/referrals" element={<Referrals />} />
         <Route path="/giftcard/:id" element={<GiftCardDetails />} />
-        <Route path="/admin/login" element={<AdminLogin />} />
+      
 
         {/* ✅ Protected User Routes */}
         <Route element={<ProtectedRoute />}>
