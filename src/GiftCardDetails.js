@@ -24,7 +24,7 @@ const GiftCardDetails = () => {
         return;
       }
 
-      const response = await axios.get(`http://localhost:4500/api/giftcards/${id}`, {
+      const response = await axios.get(`https://ugobueze-app.onrender.com/api/giftcards/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -104,7 +104,7 @@ const GiftCardDetails = () => {
         headers['x-api-key'] = process.env.REACT_APP_JWT_SECRET || 'ugobtcapi_jwtPrivateKey';
       }
 
-      const response = await axios.post(`http://localhost:4500/api/giftcards/${id}/redeem`, formData, {
+      const response = await axios.post(`https://ugobueze-app.onrender.com/api/giftcards/${id}/redeem`, formData, {
         headers,
       });
 
