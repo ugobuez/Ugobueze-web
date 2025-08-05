@@ -1,64 +1,112 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { Modal, Button, Form, Alert, Table } from 'react-bootstrap';
+import { Modal, Button, Form, Alert, Table, Spinner } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 
 const AdminGiftCardManagement = () => {
-  const [giftCards, setGiftCards] = useState([]); // Ensure initial state is an array
+  const [giftCards, setGiftCards] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     brand: '',
     value: '',
     currency: 'USD',
-    image: ''
+    image: null,
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const fetchGiftCards = useCallback(async () => {
+    try {
+      const token = localStorage.getItem('token'); // Changed to 'token'
+      if (!token) {
+        setError('Please log in as an admin');
+        navigate('/login');
+        return;
+      }
+      console.log('Using token:', token); // Debug token
+      const response = await axios.get('https://ugobueze-app.onrender.com', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setGiftCards(Array.isArray(response.data.data) ? response.data.data : response.data);
+    } catch (err) {
+      console.error('Error fetching gift cards:', err);
+      if (err.response?.status === 401) {
+        setError('Session expired or unauthorized. Please log in again.');
+        localStorage.removeItem('token');
+        navigate('/login');
+      } else {
+        setError(err.response?.data?.error || 'Failed to fetch gift cards');
+      }
+      setGiftCards([]);
+    }
+  }, [navigate]); // Added navigate to dependencies
 
   useEffect(() => {
     fetchGiftCards();
-  }, []);
-
-  const fetchGiftCards = async () => {
-    try {
-      const token = localStorage.getItem('adminToken');
-      if (!token) {
-        setError('Please log in as an admin');
-        return;
-      }
-      const response = await axios.get('https://ugobueze-app.onrender.com/api/giftcards', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      // Ensure response.data is an array; fallback to empty array if not
-      setGiftCards(Array.isArray(response.data) ? response.data : []);
-    } catch (err) {
-      console.error('Error fetching gift cards:', err);
-      setError(err.response?.data?.error || 'Failed to fetch gift cards');
-      setGiftCards([]); // Reset to empty array on error
-    }
-  };
+  }, [fetchGiftCards]); // Added fetchGiftCards to dependency array
 
   const handleInputChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value, files } = e.target;
+    if (name === 'image') {
+      const file = files[0];
+      if (file) {
+        if (!file.type.startsWith('image/')) {
+          setError('Please select an image file (e.g., .jpg, .png)');
+          return;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+          // 5MB limit
+          setError('Image file size must be less than 5MB');
+          return;
+        }
+      }
+      setFormData({ ...formData, image: file || null });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const token = localStorage.getItem('adminToken');
-      await axios.post('https://ugobueze-app.onrender.com/api/giftcards', formData, {
-        headers: { 
+      const token = localStorage.getItem('token'); // Changed to 'token'
+      if (!token) {
+        setError('Please log in as an admin');
+        navigate('/login');
+        return;
+      }
+
+      const formDataToSend = new FormData();
+      formDataToSend.append('name', formData.name);
+      formDataToSend.append('brand', formData.brand);
+      formDataToSend.append('value', formData.value);
+      formDataToSend.append('currency', formData.currency);
+      if (formData.image) {
+        formDataToSend.append('image', formData.image);
+      }
+
+      await axios.post('https://ugobueze-app.onrender.com/api/giftcards', formDataToSend, {
+        headers: {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'multipart/form-data',
+        },
       });
       setShowModal(false);
       fetchGiftCards();
-      setFormData({ name: '', brand: '', value: '', currency: 'USD', image: '' });
+      setFormData({ name: '', brand: '', value: '', currency: 'USD', image: null });
       setError('');
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to create gift card');
+      console.error('Error creating gift card:', err);
+      if (err.response?.status === 401) {
+        setError('Session expired or unauthorized. Please log in again.');
+        localStorage.removeItem('token');
+        navigate('/login');
+      } else {
+        setError(err.response?.data?.error || 'Failed to create gift card');
+      }
     } finally {
       setLoading(false);
     }
@@ -67,14 +115,26 @@ const AdminGiftCardManagement = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this gift card?')) {
       try {
-        const token = localStorage.getItem('adminToken');
+        const token = localStorage.getItem('token'); // Changed to 'token'
+        if (!token) {
+          setError('Please log in as an admin');
+          navigate('/login');
+          return;
+        }
         await axios.delete(`https://ugobueze-app.onrender.com/api/giftcards/${id}`, {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` },
         });
         fetchGiftCards();
         setError('');
       } catch (err) {
-        setError(err.response?.data?.error || 'Failed to delete gift card');
+        console.error('Error deleting gift card:', err);
+        if (err.response?.status === 401) {
+          setError('Session expired or unauthorized. Please log in again.');
+          localStorage.removeItem('token');
+          navigate('/login');
+        } else {
+          setError(err.response?.data?.error || 'Failed to delete gift card');
+        }
       }
     }
   };
@@ -91,7 +151,9 @@ const AdminGiftCardManagement = () => {
       {error && <Alert variant="danger">{error}</Alert>}
 
       {loading ? (
-        <p>Loading gift cards...</p>
+        <div className="text-center">
+          <Spinner animation="border" /> Loading gift cards...
+        </div>
       ) : giftCards.length === 0 ? (
         <p>No gift cards available.</p>
       ) : (
@@ -113,8 +175,9 @@ const AdminGiftCardManagement = () => {
                   {card.image ? (
                     <img
                       src={card.image}
-                      alt={card.name}
+                      alt={card.name || 'Gift Card'}
                       style={{ width: '50px', height: '30px', objectFit: 'contain' }}
+                      onError={(e) => (e.target.src = '/placeholder-image.jpg')}
                     />
                   ) : (
                     'N/A'
@@ -125,11 +188,7 @@ const AdminGiftCardManagement = () => {
                 <td>{card.value || 'N/A'}</td>
                 <td>{card.currency || 'N/A'}</td>
                 <td>
-                  <Button
-                    variant="danger"
-                    size="sm"
-                    onClick={() => handleDelete(card._id)}
-                  >
+                  <Button variant="danger" size="sm" onClick={() => handleDelete(card._id)}>
                     Delete
                   </Button>
                 </td>
@@ -192,18 +251,17 @@ const AdminGiftCardManagement = () => {
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label>Image URL</Form.Label>
+              <Form.Label>Image</Form.Label>
               <Form.Control
-                type="url"
+                type="file"
                 name="image"
-                value={formData.image}
+                accept="image/*"
                 onChange={handleInputChange}
                 required
-                placeholder="https://example.com/image.jpg"
               />
             </Form.Group>
 
-            <Button variant="primary" type="submit" disabled={loading}>
+            <Button variant="primary" type="submit" disabled={loading || !formData.image}>
               {loading ? 'Creating...' : 'Create Gift Card'}
             </Button>
           </Form>
@@ -243,7 +301,6 @@ class GiftCardErrorBoundary extends React.Component {
   }
 }
 
-// Wrap AdminGiftCardManagement with ErrorBoundary
 const WrappedAdminGiftCardManagement = () => (
   <GiftCardErrorBoundary>
     <AdminGiftCardManagement />
