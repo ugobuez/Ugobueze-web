@@ -1,101 +1,106 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import "bootstrap/dist/css/bootstrap.min.css";
-import AdminGiftCardManagement from "./AdminRedeem";
+import React, { useState, useEffect, useCallback } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { BASE_URL } from './config';
+import AdminGiftCardManagement from './AdminRedeem';
 
 const AdminDashboard = () => {
   const [redemptions, setRedemptions] = useState([]);
-  const [error, setError] = useState("");
-  const [reason, setReason] = useState("");
+  const [error, setError] = useState('');
+  const [reasonMap, setReasonMap] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
-  // Fetch redemptions
+  const handleError = useCallback((err) => {
+    console.error('Error:', err.response?.data || err.message);
+    if (err.response?.status === 401 || err.response?.status === 403) {
+      setError('Access denied or session expired. Please re-login.');
+      localStorage.removeItem('token');
+      navigate('/login');
+    } else {
+      setError(err.response?.data?.message || 'Something went wrong.');
+    }
+  }, [navigate]);
+
   useEffect(() => {
     const fetchRedemptions = async () => {
       setIsLoading(true);
-      const token = localStorage.getItem("adminToken");
+      const token = localStorage.getItem('token');
       if (!token) {
-        setError("Please log in as an admin to view redemptions");
+        setError('Please log in as an admin');
         setIsLoading(false);
+        navigate('/login');
         return;
       }
 
       try {
-        const response = await axios.get("https://ugobueze-app.onrender.com/api/admin/redemptions", {
+        const response = await axios.get(`${BASE_URL}/api/admin/redemptions`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setRedemptions(response.data);
-        setError("");
+        setError('');
       } catch (err) {
-        console.error("Fetch error:", err.response || err);
         handleError(err);
       } finally {
         setIsLoading(false);
       }
     };
+
     fetchRedemptions();
-  }, []);
+  }, [navigate, handleError]);
 
-  // Handle error responses
-  const handleError = (err) => {
-    if (err.response?.status === 403) {
-      setError("Access denied: Admins only. Please re-login.");
-      localStorage.removeItem("token"); // Clear invalid token
-    } else if (err.response?.status === 401) {
-      setError("Session expired. Please log in again.");
-      localStorage.removeItem("token");
-    } else {
-      setError(`Failed to fetch redemptions: ${err.response?.data?.message || err.message}`);
+  const handleStatusChange = async (redemptionId, action) => {
+    const token = localStorage.getItem('token');
+    const reason = reasonMap[redemptionId] || '';
+
+    if (!token) {
+      setError('Please log in as an admin');
+      navigate('/login');
+      return;
     }
-  };
 
-  // Handle status change (accept or reject)
-  const handleStatusChange = async (redemptionId, action, rejectReason = "") => {
     try {
-      const token = localStorage.getItem("adminToken");
-      if (!token) {
-        setError("Please log in as an admin to perform this action");
-        return;
-      }
-
-      const url = `https://ugobueze-app.onrender.com/api/admin/redemptions/${redemptionId}/${action}`;
-      const config = {
-        headers: { Authorization: `Bearer ${token}` },
-        data: action === "reject" ? { reason: rejectReason } : {},
-      };
-
-      await axios.post(url, config.data, { headers: config.headers });
-
-      setRedemptions((prev) =>
-        prev.map((redemption) =>
-          redemption._id === redemptionId
-            ? {
-                ...redemption,
-                status: action === "accept" ? "approved" : "rejected",
-                reason: action === "reject" ? rejectReason : undefined,
-              }
-            : redemption
-        )
+      await axios.post(
+        `${BASE_URL}/api/admin/redemptions/${redemptionId}/${action}`, // Fixed endpoint typo
+        action === 'reject' ? { reason } : {},
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      setReason(""); // Clear reason input after action
+      setRedemptions((prev) =>
+        prev.map((r) =>
+          r._id === redemptionId
+            ? {
+                ...r,
+                status: action === 'approve' ? 'approved' : 'rejected',
+                reason: action === 'reject' ? reason : undefined,
+              }
+            : r
+        )
+      );
+      setReasonMap((prev) => ({ ...prev, [redemptionId]: '' }));
       alert(`Redemption ${action}ed successfully`);
-      setError("");
+      setError('');
     } catch (err) {
-      console.error(`Error updating status (${action}):`, err.response || err);
       handleError(err);
     }
   };
 
+  const handleReasonChange = (redemptionId, value) => {
+    setReasonMap((prev) => ({ ...prev, [redemptionId]: value }));
+  };
+
   return (
-    <div className="container mt-5 ">
+    <div className="container mt-5">
       <h2>Admin Dashboard - Redemptions</h2>
       {error && <p className="text-danger">{error}</p>}
       {isLoading && <p>Loading redemptions...</p>}
-      <table className="table table-striped">
-        <thead>
+
+      <table className="table table-bordered table-hover">
+        <thead className="table-light">
           <tr>
             <th>Gift Card</th>
+            <th>Brand</th>
             <th>User</th>
             <th>Email</th>
             <th>Amount</th>
@@ -106,54 +111,55 @@ const AdminDashboard = () => {
           </tr>
         </thead>
         <tbody>
-          {redemptions.length === 0 && !error && !isLoading && (
+          {redemptions.length === 0 && !isLoading && !error && (
             <tr>
-              <td colSpan="8">No redemptions found</td>
+              <td colSpan="9">No redemptions found.</td>
             </tr>
           )}
-          {redemptions.map((redemption) => (
-            <tr key={redemption._id}>
-              <td>{redemption.giftCardName || "N/A"}</td>
-              <td>{redemption.userName || "N/A"}</td>
-              <td>{redemption.userEmail || "N/A"}</td>
-              <td>{redemption.amount || "0"}</td>
+          {redemptions.map((r) => (
+            <tr key={r._id}>
+              <td>{r.giftCardId?.name || 'N/A'}</td>
+              <td>{r.giftCardId?.brand || 'N/A'}</td>
+              <td>{r.userId?.name || 'N/A'}</td>
+              <td>{r.userId?.email || 'N/A'}</td>
+              <td>{r.amount}</td>
               <td>
-                {redemption.image ? (
-                  <a href={redemption.image} target="_blank" rel="noopener noreferrer">
+                {r.imageUrl ? (
+                  <a href={r.imageUrl} target="_blank" rel="noopener noreferrer">
                     View Image
                   </a>
                 ) : (
-                  "No Image"
+                  'N/A'
                 )}
               </td>
-              <td>{redemption.status || "pending"}</td>
-              <td>{redemption.reason || "-"}</td>
+              <td>{r.status}</td>
+              <td>{r.reason || 'N/A'}</td>
               <td>
-                {redemption.status === "pending" && (
-                  <div className="d-flex align-items-center">
+                {r.status === 'pending' && (
+                  <>
                     <button
                       className="btn btn-success btn-sm me-2"
-                      onClick={() => handleStatusChange(redemption._id, "accept")}
+                      onClick={() => handleStatusChange(r._id, 'approve')}
                     >
                       Accept
                     </button>
-                    <div className="input-group" style={{ maxWidth: "300px" }}>
+                    <div className="input-group mb-1" style={{ maxWidth: '250px' }}>
                       <input
                         type="text"
                         className="form-control form-control-sm"
                         placeholder="Rejection reason"
-                        value={reason}
-                        onChange={(e) => setReason(e.target.value)}
+                        value={reasonMap[r._id] || ''}
+                        onChange={(e) => handleReasonChange(r._id, e.target.value)}
                       />
                       <button
                         className="btn btn-danger btn-sm"
-                        onClick={() => handleStatusChange(redemption._id, "reject", reason)}
-                        disabled={!reason.trim()}
+                        disabled={!reasonMap[r._id]?.trim()}
+                        onClick={() => handleStatusChange(r._id, 'reject')}
                       >
                         Reject
                       </button>
                     </div>
-                  </div>
+                  </>
                 )}
               </td>
             </tr>

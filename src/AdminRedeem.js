@@ -1,10 +1,9 @@
-// AdminGiftCardManagement.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Modal, Button, Form, Alert, Table } from 'react-bootstrap';
 
 const AdminGiftCardManagement = () => {
-  const [giftCards, setGiftCards] = useState([]);
+  const [giftCards, setGiftCards] = useState([]); // Ensure initial state is an array
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -23,12 +22,19 @@ const AdminGiftCardManagement = () => {
   const fetchGiftCards = async () => {
     try {
       const token = localStorage.getItem('adminToken');
+      if (!token) {
+        setError('Please log in as an admin');
+        return;
+      }
       const response = await axios.get('https://ugobueze-app.onrender.com/api/giftcards', {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setGiftCards(response.data);
+      // Ensure response.data is an array; fallback to empty array if not
+      setGiftCards(Array.isArray(response.data) ? response.data : []);
     } catch (err) {
-      setError('Failed to fetch gift cards');
+      console.error('Error fetching gift cards:', err);
+      setError(err.response?.data?.error || 'Failed to fetch gift cards');
+      setGiftCards([]); // Reset to empty array on error
     }
   };
 
@@ -50,6 +56,7 @@ const AdminGiftCardManagement = () => {
       setShowModal(false);
       fetchGiftCards();
       setFormData({ name: '', brand: '', value: '', currency: 'USD', image: '' });
+      setError('');
     } catch (err) {
       setError(err.response?.data?.error || 'Failed to create gift card');
     } finally {
@@ -65,16 +72,17 @@ const AdminGiftCardManagement = () => {
           headers: { Authorization: `Bearer ${token}` }
         });
         fetchGiftCards();
+        setError('');
       } catch (err) {
-        setError('Failed to delete gift card');
+        setError(err.response?.data?.error || 'Failed to delete gift card');
       }
     }
   };
 
   return (
     <div className="container mt-4">
-      <div className="d-flex justify-content-between align-items-center  mb-4">
-        <h2 className='mx-5'>Gift Card Management</h2>
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h2 className="mx-5">Gift Card Management</h2>
         <Button variant="primary" onClick={() => setShowModal(true)}>
           Add New Gift Card
         </Button>
@@ -82,44 +90,54 @@ const AdminGiftCardManagement = () => {
 
       {error && <Alert variant="danger">{error}</Alert>}
 
-      <Table striped bordered hover>
-        <thead>
-          <tr>
-            <th>Image</th>
-            <th>Name</th>
-            <th>Brand</th>
-            <th>Value</th>
-            <th>Currency</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {giftCards.map((card) => (
-            <tr key={card._id}>
-              <td>
-                <img 
-                  src={card.image} 
-                  alt={card.name} 
-                  style={{ width: '50px', height: '30px', objectFit: 'contain' }}
-                />
-              </td>
-              <td>{card.name}</td>
-              <td>{card.brand}</td>
-              <td>{card.value}</td>
-              <td>{card.currency}</td>
-              <td>
-                <Button 
-                  variant="danger" 
-                  size="sm"
-                  onClick={() => handleDelete(card._id)}
-                >
-                  Delete
-                </Button>
-              </td>
+      {loading ? (
+        <p>Loading gift cards...</p>
+      ) : giftCards.length === 0 ? (
+        <p>No gift cards available.</p>
+      ) : (
+        <Table striped bordered hover>
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Name</th>
+              <th>Brand</th>
+              <th>Value</th>
+              <th>Currency</th>
+              <th>Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </Table>
+          </thead>
+          <tbody>
+            {giftCards.map((card) => (
+              <tr key={card._id}>
+                <td>
+                  {card.image ? (
+                    <img
+                      src={card.image}
+                      alt={card.name}
+                      style={{ width: '50px', height: '30px', objectFit: 'contain' }}
+                    />
+                  ) : (
+                    'N/A'
+                  )}
+                </td>
+                <td>{card.name || 'N/A'}</td>
+                <td>{card.brand || 'N/A'}</td>
+                <td>{card.value || 'N/A'}</td>
+                <td>{card.currency || 'N/A'}</td>
+                <td>
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    onClick={() => handleDelete(card._id)}
+                  >
+                    Delete
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      )}
 
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
@@ -170,7 +188,6 @@ const AdminGiftCardManagement = () => {
                 <option value="NGN">NGN</option>
                 <option value="USD">USD</option>
                 <option value="EUR">EUR</option>
-               
               </Form.Select>
             </Form.Group>
 
@@ -196,4 +213,41 @@ const AdminGiftCardManagement = () => {
   );
 };
 
-export default AdminGiftCardManagement;
+// Error Boundary Component
+class GiftCardErrorBoundary extends React.Component {
+  state = { hasError: false, error: null };
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('Error in GiftCardManagement:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="container mt-4">
+          <Alert variant="danger">
+            <h4>Something went wrong</h4>
+            <p>{this.state.error?.message || 'An unexpected error occurred.'}</p>
+            <Button variant="primary" onClick={() => window.location.reload()}>
+              Refresh Page
+            </Button>
+          </Alert>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+// Wrap AdminGiftCardManagement with ErrorBoundary
+const WrappedAdminGiftCardManagement = () => (
+  <GiftCardErrorBoundary>
+    <AdminGiftCardManagement />
+  </GiftCardErrorBoundary>
+);
+
+export default WrappedAdminGiftCardManagement;
