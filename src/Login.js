@@ -17,7 +17,7 @@ const LoginForm = () => {
     setError('');
 
     try {
-      const res = await fetch('https://ugobueze-web.vercel.app/api/auth/loginNow', {
+      const res = await fetch('https://ugobueze-app.onrender.com/api/auth/loginNow', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
