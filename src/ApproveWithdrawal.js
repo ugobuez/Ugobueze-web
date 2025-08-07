@@ -202,7 +202,7 @@ const AdminRedeem = () => {
 
   return (
     <div
-      className="min-vh-100 d-flex align-items-start justify-content-center"
+      className="min-vh-100 d-flex align-items-start justify-content-center py-3"
       style={{
         background: 'linear-gradient(135deg, #2c3e50 0%, #1a202c 100%)',
       }}
@@ -222,23 +222,34 @@ const AdminRedeem = () => {
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 15px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            padding: 1.5rem;
+            margin: 0 0.5rem;
           }
           .custom-table {
             background: rgba(0, 0, 0, 0.3);
             color: #e9ecef;
+            font-size: 0.9rem;
           }
           .custom-table th {
             background: rgba(40, 167, 69, 0.2);
             color: #ffffff;
             border-color: rgba(255, 255, 255, 0.1);
+            white-space: nowrap;
           }
           .custom-table td {
             border-color: rgba(255, 255, 255, 0.1);
+            vertical-align: middle;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 120px;
           }
           .custom-btn {
             transition: all 0.3s ease;
             background: #28a745;
             border: none;
+            font-size: 0.85rem;
+            padding: 0.4rem 0.8rem;
           }
           .custom-btn:hover {
             transform: translateY(-2px);
@@ -249,13 +260,68 @@ const AdminRedeem = () => {
             background: #6c757d;
             cursor: not-allowed;
           }
+          .custom-input {
+            background: #212529 !important;
+            color: #e9ecef !important;
+            border: none !important;
+            font-size: 0.85rem;
+          }
           .custom-input:focus {
-            border-color: #28a745;
-            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+            border-color: #28a745 !important;
+            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25) !important;
+          }
+          .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+          }
+          @media (max-width: 768px) {
+            .custom-card {
+              padding: 1rem;
+              margin: 0 0.25rem;
+            }
+            .custom-table {
+              font-size: 0.8rem;
+            }
+            .custom-table th, .custom-table td {
+              padding: 0.5rem;
+              max-width: 100px;
+            }
+            .custom-btn {
+              font-size: 0.75rem;
+              padding: 0.3rem 0.6rem;
+            }
+            h2 {
+              font-size: 1.5rem;
+            }
+            h4, h5 {
+              font-size: 1.25rem;
+            }
+            .table-responsive {
+              border-radius: 8px;
+            }
+          }
+          @media (max-width: 576px) {
+            .custom-table th, .custom-table td {
+              max-width: 80px;
+              font-size: 0.75rem;
+            }
+            .custom-btn {
+              font-size: 0.7rem;
+              padding: 0.25rem 0.5rem;
+            }
+            .custom-input {
+              font-size: 0.75rem;
+            }
+            h2 {
+              font-size: 1.25rem;
+            }
+            h4, h5 {
+              font-size: 1rem;
+            }
           }
         `}
       </style>
-      <div className="col-md-10 col-lg-8 mx-auto custom-card p-5 mt-5 fade-in">
+      <div className="col-12 col-md-10 col-lg-8 custom-card fade-in">
         <h2 className="text-white text-center mb-4 fw-bold">Admin Dashboard - Redemptions and Withdrawals</h2>
 
         {loading && !withdrawals.length && !redemptions.length ? (
@@ -281,119 +347,123 @@ const AdminRedeem = () => {
             {/* Redemptions Table */}
             <div className="mb-4">
               <h4 className="text-white mb-3">Redemptions</h4>
-              <Table responsive className="custom-table">
-                <thead>
-                  <tr>
-                    <th>Gift Card</th>
-                    <th>Brand</th>
-                    <th>User</th>
-                    <th>Email</th>
-                    <th>Amount</th>
-                    <th>Image</th>
-                    <th>Status</th>
-                    <th>Reason</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {redemptions.length === 0 && (
+              <div className="table-responsive">
+                <Table responsive className="custom-table">
+                  <thead>
                     <tr>
-                      <td colSpan="9" className="text-center text-light">
-                        No redemption requests found.
-                      </td>
+                      <th>Gift Card</th>
+                      <th>Brand</th>
+                      <th>User</th>
+                      <th>Email</th>
+                      <th>Amount</th>
+                      <th>Image</th>
+                      <th>Status</th>
+                      <th>Reason</th>
+                      <th>Actions</th>
                     </tr>
-                  )}
-                  {redemptions.map(redemption => (
-                    <tr key={redemption._id}>
-                      <td>{redemption.giftCardId?.name || 'N/A'}</td>
-                      <td>{redemption.brand || 'N/A'}</td>
-                      <td>{redemption.userId?.name || 'N/A'}</td>
-                      <td>{redemption.userId?.email || 'N/A'}</td>
-                      <td>{redemption.amount}</td>
-                      <td>
-                        <a
-                          href={redemption.image}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-success"
-                        >
-                          View Image
-                        </a>
-                      </td>
-                      <td>{redemption.status}</td>
-                      <td>{redemption.reason || 'N/A'}</td>
-                      <td>
-                        <Button
-                          className="custom-btn btn-sm"
-                          onClick={() => setSelectedRedemptionId(redemption._id)}
-                          disabled={redemption.status !== 'pending' || loading}
-                        >
-                          Select
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
+                  </thead>
+                  <tbody>
+                    {redemptions.length === 0 && (
+                      <tr>
+                        <td colSpan="9" className="text-center text-light">
+                          No redemption requests found.
+                        </td>
+                      </tr>
+                    )}
+                    {redemptions.map(redemption => (
+                      <tr key={redemption._id}>
+                        <td>{redemption.giftCardId?.name || 'N/A'}</td>
+                        <td>{redemption.brand || 'N/A'}</td>
+                        <td>{redemption.userId?.name || 'N/A'}</td>
+                        <td>{redemption.userId?.email || 'N/A'}</td>
+                        <td>{redemption.amount}</td>
+                        <td>
+                          <a
+                            href={redemption.image}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-success"
+                          >
+                            View Image
+                          </a>
+                        </td>
+                        <td>{redemption.status}</td>
+                        <td>{redemption.reason || 'N/A'}</td>
+                        <td>
+                          <Button
+                            className="custom-btn btn-sm"
+                            onClick={() => setSelectedRedemptionId(redemption._id)}
+                            disabled={redemption.status !== 'pending' || loading}
+                          >
+                            Select
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              </div>
             </div>
 
             {/* Withdrawals Table */}
             <div className="mb-4">
               <h4 className="text-white mb-3">Approve/Reject Withdrawals</h4>
-              <Table responsive className="custom-table">
-                <thead>
-                  <tr>
-                    <th>User ID</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Withdrawal ID</th>
-                    <th>Amount</th>
-                    <th>Status</th>
-                    <th>Date</th>
-                    <th>Account Number</th>
-                    <th>Bank Name</th>
-                    <th>Account Name</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {withdrawals.length === 0 && (
+              <div className="table-responsive">
+                <Table responsive className="custom-table">
+                  <thead>
                     <tr>
-                      <td colSpan="11" className="text-center text-light">
-                        No withdrawal requests found.
-                      </td>
+                      <th>User ID</th>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Withdrawal ID</th>
+                      <th>Amount</th>
+                      <th>Status</th>
+                      <th>Date</th>
+                      <th>Account Number</th>
+                      <th>Bank Name</th>
+                      <th>Account Name</th>
+                      <th>Action</th>
                     </tr>
-                  )}
-                  {withdrawals.map(withdrawal => (
-                    <tr key={withdrawal.withdrawalId}>
-                      <td>{withdrawal.userId}</td>
-                      <td>{withdrawal.userName}</td>
-                      <td>{withdrawal.userEmail}</td>
-                      <td>{withdrawal.withdrawalId}</td>
-                      <td>${withdrawal.amount}</td>
-                      <td>{withdrawal.status}</td>
-                      <td>{withdrawal.date}</td>
-                      <td>{withdrawal.accountNumber}</td>
-                      <td>{withdrawal.bankName}</td>
-                      <td>{withdrawal.accountName}</td>
-                      <td>
-                        <Button
-                          className="custom-btn btn-sm"
-                          onClick={() => setSelectedWithdrawalId(withdrawal.withdrawalId)}
-                          disabled={withdrawal.status !== 'pending' || loading}
-                        >
-                          Select
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
+                  </thead>
+                  <tbody>
+                    {withdrawals.length === 0 && (
+                      <tr>
+                        <td colSpan="11" className="text-center text-light">
+                          No withdrawal requests found.
+                        </td>
+                      </tr>
+                    )}
+                    {withdrawals.map(withdrawal => (
+                      <tr key={withdrawal.withdrawalId}>
+                        <td>{withdrawal.userId}</td>
+                        <td>{withdrawal.userName}</td>
+                        <td>{withdrawal.userEmail}</td>
+                        <td>{withdrawal.withdrawalId}</td>
+                        <td>${withdrawal.amount}</td>
+                        <td>{withdrawal.status}</td>
+                        <td>{withdrawal.date}</td>
+                        <td>{withdrawal.accountNumber}</td>
+                        <td>{withdrawal.bankName}</td>
+                        <td>{withdrawal.accountName}</td>
+                        <td>
+                          <Button
+                            className="custom-btn btn-sm"
+                            onClick={() => setSelectedWithdrawalId(withdrawal.withdrawalId)}
+                            disabled={withdrawal.status !== 'pending' || loading}
+                          >
+                            Select
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              </div>
             </div>
 
             {/* Update Form */}
             {(selectedWithdrawalId || selectedRedemptionId) && (
-              <div className="custom-card p-4 mb-4">
+              <div className="custom-card p-3 mb-4">
                 <Form onSubmit={selectedWithdrawalId ? handleWithdrawalSubmit : handleRedemptionSubmit}>
                   <h5 className="text-white mb-3">
                     Update {selectedWithdrawalId ? 'Withdrawal' : 'Redemption'} (ID: {selectedWithdrawalId || selectedRedemptionId})
@@ -404,7 +474,7 @@ const AdminRedeem = () => {
                       value={status}
                       onChange={(e) => setStatus(e.target.value)}
                       disabled={loading}
-                      className="custom-input bg-dark text-light border-0"
+                      className="custom-input"
                     >
                       <option value="">Select Status</option>
                       <option value="approved">Approve</option>
@@ -420,7 +490,7 @@ const AdminRedeem = () => {
                         onChange={(e) => setReason(e.target.value)}
                         placeholder="Enter reason for rejection"
                         disabled={loading}
-                        className="custom-input bg-dark text-light border-0"
+                        className="custom-input"
                       />
                     </Form.Group>
                   )}

@@ -144,7 +144,7 @@ const AdminGiftCardManagement = () => {
   };
 
   return (
-    <div className="col-md-10 col-lg-8 mx-auto custom-card p-5 mt-5 fade-in">
+    <div className="col-12 col-md-10 col-lg-8 mx-auto custom-card p-4 mt-4 fade-in">
       <style>
         {`
           @keyframes fadeIn {
@@ -160,23 +160,33 @@ const AdminGiftCardManagement = () => {
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 15px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            margin: 0 0.5rem;
           }
           .custom-table {
             background: rgba(0, 0, 0, 0.3);
             color: #e9ecef;
+            font-size: 0.9rem;
           }
           .custom-table th {
             background: rgba(40, 167, 69, 0.2);
             color: #ffffff;
             border-color: rgba(255, 255, 255, 0.1);
+            white-space: nowrap;
           }
           .custom-table td {
             border-color: rgba(255, 255, 255, 0.1);
+            vertical-align: middle;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 120px;
           }
           .custom-btn {
             transition: all 0.3s ease;
             background: #28a745;
             border: none;
+            font-size: 0.85rem;
+            padding: 0.4rem 0.8rem;
           }
           .custom-btn:hover {
             transform: translateY(-2px);
@@ -187,13 +197,82 @@ const AdminGiftCardManagement = () => {
             background: #6c757d;
             cursor: not-allowed;
           }
+          .custom-input {
+            background: #212529 !important;
+            color: #e9ecef !important;
+            border: none !important;
+            font-size: 0.85rem;
+          }
           .custom-input:focus {
-            border-color: #28a745;
-            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+            border-color: #28a745 !important;
+            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25) !important;
+          }
+          .modal-content {
+            background: rgba(33, 37, 41, 0.95);
+            border-radius: 10px;
+            border: none;
+          }
+          .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+          }
+          .header-container {
+            flex-direction: column;
+            align-items: flex-start !important;
+            gap: 1rem;
+          }
+          @media (min-width: 768px) {
+            .header-container {
+              flex-direction: row;
+              align-items: center !important;
+            }
+          }
+          @media (max-width: 768px) {
+            .custom-card {
+              padding: 1rem;
+              margin: 0 0.25rem;
+            }
+            .custom-table {
+              font-size: 0.8rem;
+            }
+            .custom-table th, .custom-table td {
+              padding: 0.5rem;
+              max-width: 100px;
+            }
+            .custom-table td img {
+              width: 40px;
+              height: 24px;
+            }
+            .custom-btn {
+              font-size: 0.75rem;
+              padding: 0.3rem 0.6rem;
+            }
+            h2 {
+              font-size: 1.5rem;
+            }
+            .modal-content {
+              margin: 0.5rem;
+            }
+            .modal-body {
+              padding: 1rem;
+            }
+          }
+          @media (max-width: 576px) {
+            .custom-table th, .custom-table td {
+              max-width: 80px;
+              font-size: 0.75rem;
+            }
+            .custom-btn {
+              font-size: 0.7rem;
+              padding: 0.25rem 0.5rem;
+            }
+            .custom-input {
+              font-size: 0.75rem;
+            }
           }
         `}
       </style>
-      <div className="d-flex justify-content-between align-items-center mb-4">
+      <div className="d-flex justify-content-between header-container mb-4">
         <h2 className="text-white fw-bold">Gift Card Management</h2>
         <Button className="custom-btn" onClick={() => setShowModal(true)}>
           Add New Gift Card
@@ -223,50 +302,52 @@ const AdminGiftCardManagement = () => {
       ) : giftCards.length === 0 ? (
         <p className="text-light text-center">No gift cards available.</p>
       ) : (
-        <Table responsive className="custom-table">
-          <thead>
-            <tr>
-              <th>Image</th>
-              <th>Name</th>
-              <th>Brand</th>
-              <th>Value</th>
-              <th>Currency</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {giftCards.map((card) => (
-              <tr key={card._id}>
-                <td>
-                  {card.image ? (
-                    <img
-                      src={card.image}
-                      alt={card.name || 'Gift Card'}
-                      style={{ width: '50px', height: '30px', objectFit: 'contain' }}
-                      onError={(e) => (e.target.src = '/placeholder-image.jpg')}
-                    />
-                  ) : (
-                    'N/A'
-                  )}
-                </td>
-                <td>{card.name || 'N/A'}</td>
-                <td>{card.brand || 'N/A'}</td>
-                <td>{card.value || 'N/A'}</td>
-                <td>{card.currency || 'N/A'}</td>
-                <td>
-                  <Button
-                    variant="danger"
-                    size="sm"
-                    className="custom-btn"
-                    onClick={() => handleDelete(card._id)}
-                  >
-                    Delete
-                  </Button>
-                </td>
+        <div className="table-responsive">
+          <Table responsive className="custom-table">
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Brand</th>
+                <th>Value</th>
+                <th>Currency</th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </Table>
+            </thead>
+            <tbody>
+              {giftCards.map((card) => (
+                <tr key={card._id}>
+                  <td>
+                    {card.image ? (
+                      <img
+                        src={card.image}
+                        alt={card.name || 'Gift Card'}
+                        style={{ width: '50px', height: '30px', objectFit: 'contain' }}
+                        onError={(e) => (e.target.src = '/placeholder-image.jpg')}
+                      />
+                    ) : (
+                      'N/A'
+                    )}
+                  </td>
+                  <td>{card.name || 'N/A'}</td>
+                  <td>{card.brand || 'N/A'}</td>
+                  <td>{card.value || 'N/A'}</td>
+                  <td>{card.currency || 'N/A'}</td>
+                  <td>
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      className="custom-btn"
+                      onClick={() => handleDelete(card._id)}
+                    >
+                      Delete
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </div>
       )}
 
       <Modal show={showModal} onHide={() => setShowModal(false)} className="fade-in">
@@ -283,7 +364,7 @@ const AdminGiftCardManagement = () => {
                 value={formData.name}
                 onChange={handleInputChange}
                 required
-                className="custom-input bg-dark text-light border-0"
+                className="custom-input"
               />
             </Form.Group>
 
@@ -295,7 +376,7 @@ const AdminGiftCardManagement = () => {
                 value={formData.brand}
                 onChange={handleInputChange}
                 required
-                className="custom-input bg-dark text-light border-0"
+                className="custom-input"
               />
             </Form.Group>
 
@@ -307,7 +388,7 @@ const AdminGiftCardManagement = () => {
                 value={formData.value}
                 onChange={handleInputChange}
                 required
-                className="custom-input bg-dark text-light border-0"
+                className="custom-input"
               />
             </Form.Group>
 
@@ -317,7 +398,7 @@ const AdminGiftCardManagement = () => {
                 name="currency"
                 value={formData.currency}
                 onChange={handleInputChange}
-                className="custom-input bg-dark text-light border-0"
+                className="custom-input"
               >
                 <option value="NGN">NGN</option>
                 <option value="USD">USD</option>
@@ -333,7 +414,7 @@ const AdminGiftCardManagement = () => {
                 accept="image/*"
                 onChange={handleInputChange}
                 required
-                className="custom-input bg-dark text-light border-0"
+                className="custom-input"
               />
             </Form.Group>
 
@@ -366,7 +447,7 @@ class GiftCardErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="col-md-10 col-lg-8 mx-auto custom-card p-5 mt-5 fade-in">
+        <div className="col-12 col-md-10 col-lg-8 mx-auto custom-card p-4 mt-4 fade-in">
           <Alert variant="danger" className="d-flex align-items-center">
             <svg
               className="bi flex-shrink-0 me-2"

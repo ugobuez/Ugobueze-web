@@ -95,7 +95,7 @@ const AdminDashboard = () => {
 
   return (
     <div
-      className="min-vh-100 d-flex align-items-start justify-content-center"
+      className="min-vh-100 d-flex align-items-start justify-content-center py-3"
       style={{
         background: 'linear-gradient(135deg, #2c3e50 0%, #1a202c 100%)',
       }}
@@ -115,23 +115,34 @@ const AdminDashboard = () => {
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 15px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            padding: 1.5rem;
+            margin: 0 0.5rem;
           }
           .custom-table {
             background: rgba(0, 0, 0, 0.3);
             color: #e9ecef;
+            font-size: 0.9rem;
           }
           .custom-table th {
             background: rgba(40, 167, 69, 0.2);
             color: #ffffff;
             border-color: rgba(255, 255, 255, 0.1);
+            white-space: nowrap;
           }
           .custom-table td {
             border-color: rgba(255, 255, 255, 0.1);
+            vertical-align: middle;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 150px;
           }
           .custom-btn {
             transition: all 0.3s ease;
             background: #28a745;
             border: none;
+            font-size: 0.85rem;
+            padding: 0.4rem 0.8rem;
           }
           .custom-btn:hover {
             transform: translateY(-2px);
@@ -142,13 +153,70 @@ const AdminDashboard = () => {
             background: #6c757d;
             cursor: not-allowed;
           }
+          .custom-input {
+            background: #212529 !important;
+            color: #e9ecef !important;
+            border: none !important;
+            font-size: 0.85rem;
+          }
           .custom-input:focus {
-            border-color: #28a745;
-            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+            border-color: #28a745 !important;
+            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25) !important;
+          }
+          .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+          }
+          @media (max-width: 768px) {
+            .custom-card {
+              padding: 1rem;
+              margin: 0 0.25rem;
+            }
+            .custom-table {
+              font-size: 0.8rem;
+            }
+            .custom-table th, .custom-table td {
+              padding: 0.5rem;
+              max-width: 100px;
+            }
+            .custom-btn {
+              font-size: 0.75rem;
+              padding: 0.3rem 0.6rem;
+            }
+            .input-group {
+              flex-direction: column;
+              gap: 0.5rem;
+            }
+            .input-group .form-control {
+              width: 100%;
+            }
+            h2 {
+              font-size: 1.5rem;
+            }
+            .table-responsive {
+              border-radius: 8px;
+              overflow-x: auto;
+            }
+          }
+          @media (max-width: 576px) {
+            .custom-table th, .custom-table td {
+              max-width: 80px;
+              font-size: 0.75rem;
+            }
+            .custom-btn {
+              font-size: 0.7rem;
+              padding: 0.25rem 0.5rem;
+            }
+            .input-group {
+              max-width: 100% !important;
+            }
+            .custom-input {
+              font-size: 0.75rem;
+            }
           }
         `}
       </style>
-      <div className="col-md-10 col-lg-8 mx-auto custom-card p-5 mt-5 fade-in">
+      <div className="col-12 col-md-10 col-lg-8 custom-card fade-in">
         <h2 className="text-white text-center mb-4 fw-bold">Admin Dashboard - Redemptions</h2>
         {isLoading && (
           <div className="text-center text-white mb-4">
@@ -170,84 +238,86 @@ const AdminDashboard = () => {
             <div>{error}</div>
           </Alert>
         )}
-        <Table responsive className="custom-table mb-4">
-          <thead>
-            <tr>
-              <th>Gift Card</th>
-              <th>Brand</th>
-              <th>User</th>
-              <th>Email</th>
-              <th>Amount</th>
-              <th>Image</th>
-              <th>Status</th>
-              <th>Reason</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {redemptions.length === 0 && !isLoading && !error && (
+        <div className="table-responsive">
+          <Table responsive className="custom-table mb-4">
+            <thead>
               <tr>
-                <td colSpan="9" className="text-center text-light">
-                  No redemptions found.
-                </td>
+                <th>Gift Card</th>
+                <th>Brand</th>
+                <th>User</th>
+                <th>Email</th>
+                <th>Amount</th>
+                <th>Image</th>
+                <th>Status</th>
+                <th>Reason</th>
+                <th>Actions</th>
               </tr>
-            )}
-            {redemptions.map((r) => (
-              <tr key={r._id}>
-                <td>{r.giftCardId?.name || 'N/A'}</td>
-                <td>{r.giftCardId?.brand || 'N/A'}</td>
-                <td>{r.userId?.name || 'N/A'}</td>
-                <td>{r.userId?.email || 'N/A'}</td>
-                <td>{r.amount}</td>
-                <td>
-                  {r.imageUrl ? (
-                    <a
-                      href={r.imageUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-success"
-                    >
-                      View Image
-                    </a>
-                  ) : (
-                    'N/A'
-                  )}
-                </td>
-                <td>{r.status}</td>
-                <td>{r.reason || 'N/A'}</td>
-                <td>
-                  {r.status === 'pending' && (
-                    <div className="d-flex flex-column gap-2">
-                      <Button
-                        className="custom-btn btn-sm"
-                        onClick={() => handleStatusChange(r._id, 'approve')}
+            </thead>
+            <tbody>
+              {redemptions.length === 0 && !isLoading && !error && (
+                <tr>
+                  <td colSpan="9" className="text-center text-light">
+                    No redemptions found.
+                  </td>
+                </tr>
+              )}
+              {redemptions.map((r) => (
+                <tr key={r._id}>
+                  <td>{r.giftCardId?.name || 'N/A'}</td>
+                  <td>{r.giftCardId?.brand || 'N/A'}</td>
+                  <td>{r.userId?.name || 'N/A'}</td>
+                  <td>{r.userId?.email || 'N/A'}</td>
+                  <td>{r.amount}</td>
+                  <td>
+                    {r.imageUrl ? (
+                      <a
+                        href={r.imageUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-success"
                       >
-                        Accept
-                      </Button>
-                      <div className="input-group" style={{ maxWidth: '250px' }}>
-                        <Form.Control
-                          type="text"
-                          placeholder="Rejection reason"
-                          value={reasonMap[r._id] || ''}
-                          onChange={(e) => handleReasonChange(r._id, e.target.value)}
-                          className="custom-input bg-dark text-light border-0"
-                        />
+                        View Image
+                      </a>
+                    ) : (
+                      'N/A'
+                    )}
+                  </td>
+                  <td>{r.status}</td>
+                  <td>{r.reason || 'N/A'}</td>
+                  <td>
+                    {r.status === 'pending' && (
+                      <div className="d-flex flex-column gap-2">
                         <Button
-                          variant="danger"
-                          size="sm"
-                          disabled={!reasonMap[r._id]?.trim()}
-                          onClick={() => handleStatusChange(r._id, 'reject')}
+                          className="custom-btn btn-sm"
+                          onClick={() => handleStatusChange(r._id, 'approve')}
                         >
-                          Reject
+                          Accept
                         </Button>
+                        <div className="input-group" style={{ maxWidth: '250px' }}>
+                          <Form.Control
+                            type="text"
+                            placeholder="Rejection reason"
+                            value={reasonMap[r._id] || ''}
+                            onChange={(e) => handleReasonChange(r._id, e.target.value)}
+                            className="custom-input"
+                          />
+                          <Button
+                            variant="danger"
+                            size="sm"
+                            disabled={!reasonMap[r._id]?.trim()}
+                            onClick={() => handleStatusChange(r._id, 'reject')}
+                          >
+                            Reject
+                          </Button>
+                        </div>
                       </div>
-                    </div>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </div>
         <AdminGiftCardManagement />
         <AdminWithdrawalApproval />
       </div>
