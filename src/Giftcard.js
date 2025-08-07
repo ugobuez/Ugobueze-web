@@ -1,3 +1,7 @@
+// Fix for your issue: response from fetch is returning HTML, not JSON.
+// Most likely cause: wrong endpoint or incorrect method.
+// We need to guard against that and possibly update API routes/methods.
+
 import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useNavigate } from "react-router-dom";
@@ -19,30 +23,27 @@ const GiftCard = () => {
           return;
         }
 
-        console.log(`Fetching gift cards from ${BASE_URL}/api/giftcards with token: ${token.substring(0, 20)}...`);
         const res = await fetch(`${BASE_URL}/api/giftcards`, {
+          method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
+            Accept: "application/json",
           },
         });
 
-        if (!res.ok) {
-          const errorData = await res.json();
-          console.error('GiftCard fetch response:', errorData);
-          throw new Error(errorData.message || `HTTP error ${res.status}`);
+        const contentType = res.headers.get("content-type");
+        if (!res.ok || !contentType?.includes("application/json")) {
+          const text = await res.text();
+          throw new Error(`Unexpected response: ${text.slice(0, 100)}`);
         }
 
         const data = await res.json();
         const cards = Array.isArray(data) ? data : (data.success && Array.isArray(data.data) ? data.data : []);
-        if (!cards.length && !Array.isArray(data)) {
-          throw new Error("Invalid data format");
-        }
 
         setGiftCards(cards);
         setError("");
       } catch (err) {
-        console.error("GiftCard fetch error:", err.message, err);
+        console.error("GiftCard fetch error:", err.message);
         setError(`Could not load gift cards: ${err.message}`);
       }
     };
