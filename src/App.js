@@ -8,7 +8,8 @@ import Signup from "./Signup";
 import Dashboard from "./Dashboard";
 import GiftCardDetails from "./GiftCardDetails";
 import AdminDashboard from "./AdminDashboard";
-
+import Wallet from "./Wallet";
+import Activities from "./Activities";
 import Sellgiftcard from "./Sellgiftcard";
 import Referrals from "./Referrals";
 
@@ -24,6 +25,8 @@ const App = () => {
     "/dashboard",
     "/admin/dashboard",
     "/Hot",
+    "/wallet",
+    "/transactions"
   ];
 
   return (
@@ -34,10 +37,10 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/Hot" element={<Sellgiftcard />} />
+        <Route path="/Wallet" element={<Wallet />} />
         <Route path="/referrals" element={<Referrals />} />
         <Route path="/giftcard/:id" element={<GiftCardDetails />} />
-      
-
+        <Route path="/transactions" element={<Activities />} />
         {/* ✅ Protected User Routes */}
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />

@@ -6,7 +6,7 @@ export default function GiftCards() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("https://ugobueze-app.onrender.com/api/giftcards", {
+    fetch("https://ugobueze-web.vercel.app/api/giftcards", {
       headers: {
         "Authorization": `Bearer ${localStorage.getItem("token")}`, // use consistent token key
       }

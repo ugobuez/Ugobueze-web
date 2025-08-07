@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import {  useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-const BASE_URL = "https://ugobueze-app.onrender.com";
+const BASE_URL = "https://ugobueze-web.vercel.app";
 
 const GiftCard = () => {
   const [giftCards, setGiftCards] = useState([]);
@@ -19,14 +19,17 @@ const GiftCard = () => {
           return;
         }
 
+        console.log(`Fetching gift cards from ${BASE_URL}/api/giftcards with token: ${token.substring(0, 20)}...`);
         const res = await fetch(`${BASE_URL}/api/giftcards`, {
           headers: {
             Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
           },
         });
 
         if (!res.ok) {
           const errorData = await res.json();
+          console.error('GiftCard fetch response:', errorData);
           throw new Error(errorData.message || `HTTP error ${res.status}`);
         }
 
@@ -37,8 +40,9 @@ const GiftCard = () => {
         }
 
         setGiftCards(cards);
+        setError("");
       } catch (err) {
-        console.error("GiftCard fetch error:", err);
+        console.error("GiftCard fetch error:", err.message, err);
         setError(`Could not load gift cards: ${err.message}`);
       }
     };

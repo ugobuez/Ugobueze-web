@@ -5,7 +5,7 @@ import { Navbar } from "react-bootstrap";
 import "./Crown.css";
 import GiftCard from "./Giftcard";
 
-const BASE_URL = "https://ugobueze-app.onrender.com";
+const BASE_URL = "https://ugobueze-web.vercel.app";
 
 const Dashboard = () => {
   const [balance, setBalance] = useState(0);
@@ -116,7 +116,7 @@ const Dashboard = () => {
       </div>
 
       <nav className="bottom-nav">
-        <Link to="/home">🏠 Home</Link>
+        <Link to="/">🏠 Home</Link>
         <Link to="/wallet">💼 Wallet</Link>
         <Link to="/transactions">📄 Transactions</Link>
       </nav>

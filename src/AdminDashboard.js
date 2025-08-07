@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { BASE_URL } from './config';
 import AdminGiftCardManagement from './AdminRedeem';
+import AdminWithdrawalApproval from './ApproveWithdrawal';
 
 const AdminDashboard = () => {
   const [redemptions, setRedemptions] = useState([]);
@@ -167,6 +168,7 @@ const AdminDashboard = () => {
         </tbody>
       </table>
       <AdminGiftCardManagement/>
+      <AdminWithdrawalApproval/>
     </div>
   );
 };

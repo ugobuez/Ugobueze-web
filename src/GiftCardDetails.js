@@ -24,18 +24,24 @@ const GiftCardDetails = () => {
         return;
       }
 
-      const response = await axios.get(`https://ugobueze-app.onrender.com/api/giftcards/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
+      console.log(`Fetching gift card ${id} from https://ugobueze-web.vercel.app/api/giftcards/${id} with token: ${token.substring(0, 20)}...`);
+      const response = await axios.get(`https://ugobueze-web.vercel.app/api/giftcards/${id}`, {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
 
-      setGiftCard(response.data.data); // Backend returns { success: true, data: {...} }
+      setGiftCard(response.data.data);
       setError('');
     } catch (err) {
-      console.error('Fetch gift card error:', err);
+      console.error('Fetch gift card error:', err.response?.data || err.message);
       if (err.response?.status === 401) {
         setError('Session expired or unauthorized. Please log in again.');
         localStorage.removeItem('token');
         navigate('/login');
+      } else if (err.response?.status === 403) {
+        setError('You do not have permission to access this gift card.');
       } else if (err.response?.status === 404) {
         setError('Gift card not found.');
       } else {
@@ -98,13 +104,12 @@ const GiftCardDetails = () => {
     formData.append('image', image);
 
     try {
-      const headers = { Authorization: `Bearer ${token}` };
-      // Only include x-api-key if required by backend
-      if (process.env.REACT_APP_REQUIRE_API_KEY === 'true') {
-        headers['x-api-key'] = process.env.REACT_APP_JWT_SECRET || 'ugobtcapi_jwtPrivateKey';
-      }
-
-      const response = await axios.post(`https://ugobueze-app.onrender.com/api/giftcards/${id}/redeem`, formData, {
+      const headers = { 
+        Authorization: `Bearer ${token}`,
+        // Content-Type is set automatically by FormData
+      };
+      console.log(`Submitting redemption to https://ugobueze-web.vercel.app/api/giftcards/${id}/redeem`);
+      const response = await axios.post(`https://ugobueze-web.vercel.app/api/giftcards/${id}/redeem`, formData, {
         headers,
       });
 
@@ -112,11 +117,13 @@ const GiftCardDetails = () => {
       setAmount('');
       setImage(null);
     } catch (err) {
-      console.error('Submit error:', err);
+      console.error('Submit error:', err.response?.data || err.message);
       if (err.response?.status === 401) {
         setError('Session expired or unauthorized. Please log in again.');
         localStorage.removeItem('token');
         navigate('/login');
+      } else if (err.response?.status === 403) {
+        setError('You do not have permission to redeem this gift card.');
       } else {
         setError(err.response?.data?.message || 'An error occurred during submission.');
       }
