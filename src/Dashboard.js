@@ -5,7 +5,7 @@ import { Navbar } from "react-bootstrap";
 import "./Crown.css";
 import GiftCard from "./Giftcard";
 
-const BASE_URL = "https://ugobueze-web.vercel.app";
+const BASE_URL = "https://ugobueze-app.onrender.com";
 
 const Dashboard = () => {
   const [balance, setBalance] = useState(0);
@@ -74,8 +74,8 @@ const Dashboard = () => {
         <div className="balance-section">
           <p>📢 Minimum withdrawal amount will be improved</p>
           <div className="balance-card">
-            <p>Naira Balance</p>
-            <h3>₦{balance.toLocaleString("en-NG", { minimumFractionDigits: 2 })}</h3>
+            <p>Dollar Balance</p>
+            <h3>${balance.toLocaleString("en-NG", { minimumFractionDigits: 2 })}</h3>
             {referralCode && (
               <>
                 <p><strong>Referral Code:</strong> <code>{referralCode}</code></p>

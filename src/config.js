@@ -1,5 +1,5 @@
 // src/config.js
-export const BASE_URL = 'https://ugobueze-web.vercel.app';
+export const BASE_URL = 'https://ugobueze-app.onrender.com';
 
 // Additional configuration values can be added here in the future, e.g.:
 // export const API_TIMEOUT = 5000;

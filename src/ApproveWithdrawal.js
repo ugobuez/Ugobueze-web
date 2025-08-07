@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Spinner, Alert, Form, Button, Table } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-const BASE_URL = 'https://ugobueze-web.vercel.app';
+const BASE_URL = 'https://ugobueze-app.onrender.com';
 
 const AdminRedeem = () => {
   const [withdrawals, setWithdrawals] = useState([]);

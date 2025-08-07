@@ -1,12 +1,10 @@
-// Fix for your issue: response from fetch is returning HTML, not JSON.
-// Most likely cause: wrong endpoint or incorrect method.
-// We need to guard against that and possibly update API routes/methods.
+
 
 import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useNavigate } from "react-router-dom";
 
-const BASE_URL = "https://ugobueze-web.vercel.app";
+const BASE_URL = "https://ugobueze-app.onrender.com";
 
 const GiftCard = () => {
   const [giftCards, setGiftCards] = useState([]);

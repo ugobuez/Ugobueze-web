@@ -24,8 +24,8 @@ const GiftCardDetails = () => {
         return;
       }
 
-      console.log(`Fetching gift card ${id} from https://ugobueze-web.vercel.app/api/giftcards/${id} with token: ${token.substring(0, 20)}...`);
-      const response = await axios.get(`https://ugobueze-web.vercel.app/api/giftcards/${id}`, {
+      console.log(`Fetching gift card ${id} from https://ugobueze-app.onrender.com/api/giftcards/${id} with token: ${token.substring(0, 20)}...`);
+      const response = await axios.get(`https://ugobueze-app.onrender.com/api/giftcards/${id}`, {
         headers: { 
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -108,8 +108,8 @@ const GiftCardDetails = () => {
         Authorization: `Bearer ${token}`,
         // Content-Type is set automatically by FormData
       };
-      console.log(`Submitting redemption to https://ugobueze-web.vercel.app/api/giftcards/${id}/redeem`);
-      const response = await axios.post(`https://ugobueze-web.vercel.app/api/giftcards/${id}/redeem`, formData, {
+      console.log(`Submitting redemption to https://ugobueze-app.onrender.com/api/giftcards/${id}/redeem`);
+      const response = await axios.post(`https://ugobueze-app.onrender.com/api/giftcards/${id}/redeem`, formData, {
         headers,
       });
 

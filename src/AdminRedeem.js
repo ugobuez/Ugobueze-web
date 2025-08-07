@@ -4,7 +4,7 @@ import { Modal, Button, Form, Alert, Table, Spinner } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
 // Centralize API base URL
-const API_BASE_URL = 'https://ugobueze-web.vercel.app/api';
+const API_BASE_URL = 'https://ugobueze-app.onrender.com/api';
 
 const AdminGiftCardManagement = () => {
   const [giftCards, setGiftCards] = useState([]);

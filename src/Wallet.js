@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Spinner, Alert, Form, Button } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-const BASE_URL = 'https://ugobueze-web.vercel.app';
+const BASE_URL = 'https://ugobueze-app.onrender.com';
 
 const Withdraw = () => {
   const [balance, setBalance] = useState(null);
