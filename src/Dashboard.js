@@ -1,8 +1,8 @@
+
 import React, { useEffect, useState, useCallback } from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
 import { Link, useNavigate } from "react-router-dom";
-import { Navbar } from "react-bootstrap";
-import "./Crown.css";
+import { Navbar, Spinner, Alert, Button } from "react-bootstrap";
+import "bootstrap/dist/css/bootstrap.min.css";
 import GiftCard from "./Giftcard";
 
 const BASE_URL = "https://ugobueze-app.onrender.com";
@@ -58,68 +58,154 @@ const Dashboard = () => {
   }, [fetchUserData]);
 
   return (
-    <div className="dashboard-container">
-      <div className="dashboard-card">
-        <div className="dashboard-header">
-          <Navbar.Brand as={Link} to="/" className="fw-bold fs-3 position-relative">
-            Ugobu<span className="crown-2">👑</span>eze
+    <div
+      className="min-vh-100 d-flex align-items-start justify-content-center"
+      style={{
+        background: 'linear-gradient(135deg, #2c3e50 0%, #1a202c 100%)',
+      }}
+    >
+      <style>
+        {`
+          @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+          .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+          }
+          .custom-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+          }
+          .custom-btn {
+            transition: all 0.3s ease;
+            background: #28a745;
+            border: none;
+          }
+          .custom-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            background: #218838;
+          }
+          .custom-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+          }
+          .balance-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 1.5rem;
+          }
+          .feature-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 0.75rem;
+            text-align: center;
+            transition: all 0.3s ease;
+          }
+          .feature-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+          }
+          .bottom-nav a {
+            color: #e9ecef;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+          }
+          .bottom-nav a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #28a745;
+          }
+          .congratulations-banner {
+            background: linear-gradient(90deg, #28a745, #218838);
+            border-radius: 10px;
+            padding: 1rem;
+            color: #fff;
+            text-align: center;
+          }
+        `}
+      </style>
+      <div className="col-md-10 col-lg-8 mx-auto custom-card p-5 mt-5 fade-in">
+        <div className="dashboard-header mb-4">
+          <Navbar.Brand as={Link} to="/" className="fw-bold fs-3 text-white position-relative">
+            Ugobu<span style={{ color: '#28a745' }}>👑</span>eze
           </Navbar.Brand>
-          <div className="congratulations-banner">
-            <p>🎉 Congratulations 🎉</p>
-            <p>200,000 $ Single-day transaction</p>
-            <p>50,000 Number of members</p>
+          <div className="congratulations-banner mt-3">
+            <p className="mb-1 fw-bold">🎉 Congratulations 🎉</p>
+            <p className="mb-1">$200,000 Single-day transaction</p>
+            <p className="mb-0">50,000 Number of members</p>
           </div>
         </div>
 
-        <div className="balance-section">
-          <p>📢 Minimum withdrawal amount will be improved</p>
+        <div className="balance-section mb-4">
+          <p className="text-light mb-2">📢 Minimum withdrawal amount will be improved</p>
           <div className="balance-card">
-            <p>Dollar Balance</p>
-            <h3>${balance.toLocaleString("en-NG", { minimumFractionDigits: 2 })}</h3>
+            <p className="text-light mb-1">Dollar Balance</p>
+            <h3 className="text-success fw-bold">
+              ${balance.toLocaleString("en-NG", { minimumFractionDigits: 2 })}
+            </h3>
             {referralCode && (
               <>
-                <p><strong>Referral Code:</strong> <code>{referralCode}</code></p>
-                <p><strong>Total Referrals:</strong> {referralCount}</p>
+                <p className="text-light">
+                  <strong>Referral Code:</strong> <code className="text-white">{referralCode}</code>
+                </p>
+                <p className="text-light">
+                  <strong>Total Referrals:</strong> {referralCount}
+                </p>
               </>
             )}
-            {loading && <p>Loading balance...</p>}
-            {error && <p className="text-danger">{error}</p>}
-            <button
-              className="btn btn-secondary btn-sm mt-2"
+            {loading && (
+              <div className="text-center text-white mt-2">
+                <Spinner animation="border" variant="success" size="sm" /> Loading balance...
+              </div>
+            )}
+            {error && <Alert variant="danger" className="mt-2">{error}</Alert>}
+            <Button
+              variant="success"
+              size="sm"
+              className="mt-2 custom-btn"
               onClick={() => fetchUserData(1)}
               disabled={loading}
             >
               {loading ? "Refreshing..." : "Refresh Balance"}
-            </button>
+            </Button>
           </div>
         </div>
 
         <Link to="/Hot">
-          <button className="sell-gift-card-btn">Sell Gift Card</button>
+          <Button className="w-100 mb-4 custom-btn">Sell Gift Card</Button>
         </Link>
 
-        <div className="features-section">
-          <div className="feature-item">💰 Referral program</div>
-          <div className="feature-item">🎟️ Coupon</div>
-          <div className="feature-item">👑 VIP Center</div>
-          <div className="feature-item">👤 Customer Service</div>
+        <div className="features-section d-flex flex-wrap gap-3 mb-4">
+          <div className="feature-item flex-grow-1">💰 Referral program</div>
+          <div className="feature-item flex-grow-1">🎟️ Coupon</div>
+          <div className="feature-item flex-grow-1">👑 VIP Center</div>
+          <div className="feature-item flex-grow-1">👤 Customer Service</div>
         </div>
 
-        <div className="recent-transactions">
-          <p>✅ X220******0025 sold 400 USD (fast card) iTunes/Apple gift card earned 457200₦</p>
+        <div className="recent-transactions mb-4">
+          <p className="text-light">
+            ✅ X220******0025 sold 400 USD (fast card) iTunes/Apple gift card earned 457,200₦
+          </p>
         </div>
 
         <div className="hot-cards">
-          <h4>Hot Cards</h4>
+          <h4 className="text-white mb-3">Hot Cards</h4>
           <GiftCard />
         </div>
-      </div>
 
-      <nav className="bottom-nav">
-        <Link to="/">🏠 Home</Link>
-        <Link to="/wallet">💼 Wallet</Link>
-        <Link to="/transactions">📄 Transactions</Link>
-      </nav>
+        <nav className="bottom-nav d-flex justify-content-around mt-4">
+          <Link to="/">🏠 Home</Link>
+          <Link to="/wallet">💼 Wallet</Link>
+          <Link to="/transactions">📄 Transactions</Link>
+        </nav>
+      </div>
     </div>
   );
 };

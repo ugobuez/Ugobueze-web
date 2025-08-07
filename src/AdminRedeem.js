@@ -1,9 +1,9 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { Modal, Button, Form, Alert, Table, Spinner } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
-// Centralize API base URL
 const API_BASE_URL = 'https://ugobueze-app.onrender.com/api';
 
 const AdminGiftCardManagement = () => {
@@ -144,24 +144,86 @@ const AdminGiftCardManagement = () => {
   };
 
   return (
-    <div className="container mt-4">
+    <div className="col-md-10 col-lg-8 mx-auto custom-card p-5 mt-5 fade-in">
+      <style>
+        {`
+          @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+          .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+          }
+          .custom-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+          }
+          .custom-table {
+            background: rgba(0, 0, 0, 0.3);
+            color: #e9ecef;
+          }
+          .custom-table th {
+            background: rgba(40, 167, 69, 0.2);
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.1);
+          }
+          .custom-table td {
+            border-color: rgba(255, 255, 255, 0.1);
+          }
+          .custom-btn {
+            transition: all 0.3s ease;
+            background: #28a745;
+            border: none;
+          }
+          .custom-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            background: #218838;
+          }
+          .custom-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+          }
+          .custom-input:focus {
+            border-color: #28a745;
+            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+          }
+        `}
+      </style>
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2 className="mx-5">Gift Card Management</h2>
-        <Button variant="primary" onClick={() => setShowModal(true)}>
+        <h2 className="text-white fw-bold">Gift Card Management</h2>
+        <Button className="custom-btn" onClick={() => setShowModal(true)}>
           Add New Gift Card
         </Button>
       </div>
 
-      {error && <Alert variant="danger">{error}</Alert>}
+      {error && (
+        <Alert variant="danger" className="d-flex align-items-center mb-4">
+          <svg
+            className="bi flex-shrink-0 me-2"
+            width="24"
+            height="24"
+            fill="currentColor"
+            viewBox="0 0 16 16"
+          >
+            <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+          </svg>
+          <div>{error}</div>
+        </Alert>
+      )}
 
       {loading ? (
-        <div className="text-center">
-          <Spinner animation="border" /> Loading gift cards...
+        <div className="text-center text-white">
+          <Spinner animation="border" variant="success" className="mb-2" />
+          <p>Loading gift cards...</p>
         </div>
       ) : giftCards.length === 0 ? (
-        <p>No gift cards available.</p>
+        <p className="text-light text-center">No gift cards available.</p>
       ) : (
-        <Table striped bordered hover>
+        <Table responsive className="custom-table">
           <thead>
             <tr>
               <th>Image</th>
@@ -192,7 +254,12 @@ const AdminGiftCardManagement = () => {
                 <td>{card.value || 'N/A'}</td>
                 <td>{card.currency || 'N/A'}</td>
                 <td>
-                  <Button variant="danger" size="sm" onClick={() => handleDelete(card._id)}>
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    className="custom-btn"
+                    onClick={() => handleDelete(card._id)}
+                  >
                     Delete
                   </Button>
                 </td>
@@ -202,51 +269,55 @@ const AdminGiftCardManagement = () => {
         </Table>
       )}
 
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
-        <Modal.Header closeButton>
+      <Modal show={showModal} onHide={() => setShowModal(false)} className="fade-in">
+        <Modal.Header closeButton className="bg-dark text-light border-0">
           <Modal.Title>Add New Gift Card</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body className="bg-dark">
           <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3">
-              <Form.Label>Name</Form.Label>
+              <Form.Label className="text-light">Name</Form.Label>
               <Form.Control
                 type="text"
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
                 required
+                className="custom-input bg-dark text-light border-0"
               />
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label>Brand</Form.Label>
+              <Form.Label className="text-light">Brand</Form.Label>
               <Form.Control
                 type="text"
                 name="brand"
                 value={formData.brand}
                 onChange={handleInputChange}
                 required
+                className="custom-input bg-dark text-light border-0"
               />
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label>Value</Form.Label>
+              <Form.Label className="text-light">Value</Form.Label>
               <Form.Control
                 type="number"
                 name="value"
                 value={formData.value}
                 onChange={handleInputChange}
                 required
+                className="custom-input bg-dark text-light border-0"
               />
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label>Currency</Form.Label>
+              <Form.Label className="text-light">Currency</Form.Label>
               <Form.Select
                 name="currency"
                 value={formData.currency}
                 onChange={handleInputChange}
+                className="custom-input bg-dark text-light border-0"
               >
                 <option value="NGN">NGN</option>
                 <option value="USD">USD</option>
@@ -255,17 +326,22 @@ const AdminGiftCardManagement = () => {
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label>Image</Form.Label>
+              <Form.Label className="text-light">Image</Form.Label>
               <Form.Control
                 type="file"
                 name="image"
                 accept="image/*"
                 onChange={handleInputChange}
                 required
+                className="custom-input bg-dark text-light border-0"
               />
             </Form.Group>
 
-            <Button variant="primary" type="submit" disabled={loading || !formData.image}>
+            <Button
+              className="custom-btn"
+              type="submit"
+              disabled={loading || !formData.image}
+            >
               {loading ? 'Creating...' : 'Create Gift Card'}
             </Button>
           </Form>
@@ -290,13 +366,24 @@ class GiftCardErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="container mt-4">
-          <Alert variant="danger">
-            <h4>Something went wrong</h4>
-            <p>{this.state.error?.message || 'An unexpected error occurred.'}</p>
-            <Button variant="primary" onClick={() => window.location.reload()}>
-              Refresh Page
-            </Button>
+        <div className="col-md-10 col-lg-8 mx-auto custom-card p-5 mt-5 fade-in">
+          <Alert variant="danger" className="d-flex align-items-center">
+            <svg
+              className="bi flex-shrink-0 me-2"
+              width="24"
+              height="24"
+              fill="currentColor"
+              viewBox="0 0 16 16"
+            >
+              <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+            </svg>
+            <div>
+              <h4>Something went wrong</h4>
+              <p>{this.state.error?.message || 'An unexpected error occurred.'}</p>
+              <Button className="custom-btn" onClick={() => window.location.reload()}>
+                Refresh Page
+              </Button>
+            </div>
           </Alert>
         </div>
       );

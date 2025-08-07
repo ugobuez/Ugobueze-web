@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import Coursel from "./Coursel";
 import AOS from 'aos';
 import 'aos/dist/aos.css'; // You can also use <link> for styles
-// ..
+import Referrals from "./Referrals"; 
 AOS.init();
 
 // You can also pass an optional settings object
@@ -43,7 +43,7 @@ const Home = () => {
         <div className="col-md-6 text-center">
           <img src={Sell} className="w-100 my-5" alt="sell" />
           <div className="move">
-            <Link to="/login" className="text-decoration-none">
+            <Link to="/Hot" className="text-decoration-none">
               <button className="btn my-1 pt-2 btn-gin px-4">Sell now</button>
             </Link>
           </div>
@@ -59,8 +59,9 @@ const Home = () => {
     
       </div>
       </div>
-
+<Referrals/>
       {/* Gift Card Carousel Component */}
+
       <Coursel />
     </div>
   );

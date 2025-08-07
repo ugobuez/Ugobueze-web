@@ -1,6 +1,8 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { Spinner, Alert, Table, Button, Form } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { BASE_URL } from './config';
 import AdminGiftCardManagement from './AdminRedeem';
@@ -63,7 +65,7 @@ const AdminDashboard = () => {
 
     try {
       await axios.post(
-        `${BASE_URL}/api/admin/redemptions/${redemptionId}/${action}`, // Fixed endpoint typo
+        `${BASE_URL}/api/admin/redemptions/${redemptionId}/${action}`,
         action === 'reject' ? { reason } : {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -92,83 +94,163 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="container mt-5">
-      <h2>Admin Dashboard - Redemptions</h2>
-      {error && <p className="text-danger">{error}</p>}
-      {isLoading && <p>Loading redemptions...</p>}
-
-      <table className="table table-bordered table-hover">
-        <thead className="table-light">
-          <tr>
-            <th>Gift Card</th>
-            <th>Brand</th>
-            <th>User</th>
-            <th>Email</th>
-            <th>Amount</th>
-            <th>Image</th>
-            <th>Status</th>
-            <th>Reason</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {redemptions.length === 0 && !isLoading && !error && (
+    <div
+      className="min-vh-100 d-flex align-items-start justify-content-center"
+      style={{
+        background: 'linear-gradient(135deg, #2c3e50 0%, #1a202c 100%)',
+      }}
+    >
+      <style>
+        {`
+          @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+          .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+          }
+          .custom-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+          }
+          .custom-table {
+            background: rgba(0, 0, 0, 0.3);
+            color: #e9ecef;
+          }
+          .custom-table th {
+            background: rgba(40, 167, 69, 0.2);
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.1);
+          }
+          .custom-table td {
+            border-color: rgba(255, 255, 255, 0.1);
+          }
+          .custom-btn {
+            transition: all 0.3s ease;
+            background: #28a745;
+            border: none;
+          }
+          .custom-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            background: #218838;
+          }
+          .custom-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+          }
+          .custom-input:focus {
+            border-color: #28a745;
+            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+          }
+        `}
+      </style>
+      <div className="col-md-10 col-lg-8 mx-auto custom-card p-5 mt-5 fade-in">
+        <h2 className="text-white text-center mb-4 fw-bold">Admin Dashboard - Redemptions</h2>
+        {isLoading && (
+          <div className="text-center text-white mb-4">
+            <Spinner animation="border" variant="success" className="mb-2" />
+            <p>Loading redemptions...</p>
+          </div>
+        )}
+        {error && (
+          <Alert variant="danger" className="d-flex align-items-center mb-4">
+            <svg
+              className="bi flex-shrink-0 me-2"
+              width="24"
+              height="24"
+              fill="currentColor"
+              viewBox="0 0 16 16"
+            >
+              <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+            </svg>
+            <div>{error}</div>
+          </Alert>
+        )}
+        <Table responsive className="custom-table mb-4">
+          <thead>
             <tr>
-              <td colSpan="9">No redemptions found.</td>
+              <th>Gift Card</th>
+              <th>Brand</th>
+              <th>User</th>
+              <th>Email</th>
+              <th>Amount</th>
+              <th>Image</th>
+              <th>Status</th>
+              <th>Reason</th>
+              <th>Actions</th>
             </tr>
-          )}
-          {redemptions.map((r) => (
-            <tr key={r._id}>
-              <td>{r.giftCardId?.name || 'N/A'}</td>
-              <td>{r.giftCardId?.brand || 'N/A'}</td>
-              <td>{r.userId?.name || 'N/A'}</td>
-              <td>{r.userId?.email || 'N/A'}</td>
-              <td>{r.amount}</td>
-              <td>
-                {r.imageUrl ? (
-                  <a href={r.imageUrl} target="_blank" rel="noopener noreferrer">
-                    View Image
-                  </a>
-                ) : (
-                  'N/A'
-                )}
-              </td>
-              <td>{r.status}</td>
-              <td>{r.reason || 'N/A'}</td>
-              <td>
-                {r.status === 'pending' && (
-                  <>
-                    <button
-                      className="btn btn-success btn-sm me-2"
-                      onClick={() => handleStatusChange(r._id, 'approve')}
+          </thead>
+          <tbody>
+            {redemptions.length === 0 && !isLoading && !error && (
+              <tr>
+                <td colSpan="9" className="text-center text-light">
+                  No redemptions found.
+                </td>
+              </tr>
+            )}
+            {redemptions.map((r) => (
+              <tr key={r._id}>
+                <td>{r.giftCardId?.name || 'N/A'}</td>
+                <td>{r.giftCardId?.brand || 'N/A'}</td>
+                <td>{r.userId?.name || 'N/A'}</td>
+                <td>{r.userId?.email || 'N/A'}</td>
+                <td>{r.amount}</td>
+                <td>
+                  {r.imageUrl ? (
+                    <a
+                      href={r.imageUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-success"
                     >
-                      Accept
-                    </button>
-                    <div className="input-group mb-1" style={{ maxWidth: '250px' }}>
-                      <input
-                        type="text"
-                        className="form-control form-control-sm"
-                        placeholder="Rejection reason"
-                        value={reasonMap[r._id] || ''}
-                        onChange={(e) => handleReasonChange(r._id, e.target.value)}
-                      />
-                      <button
-                        className="btn btn-danger btn-sm"
-                        disabled={!reasonMap[r._id]?.trim()}
-                        onClick={() => handleStatusChange(r._id, 'reject')}
+                      View Image
+                    </a>
+                  ) : (
+                    'N/A'
+                  )}
+                </td>
+                <td>{r.status}</td>
+                <td>{r.reason || 'N/A'}</td>
+                <td>
+                  {r.status === 'pending' && (
+                    <div className="d-flex flex-column gap-2">
+                      <Button
+                        className="custom-btn btn-sm"
+                        onClick={() => handleStatusChange(r._id, 'approve')}
                       >
-                        Reject
-                      </button>
+                        Accept
+                      </Button>
+                      <div className="input-group" style={{ maxWidth: '250px' }}>
+                        <Form.Control
+                          type="text"
+                          placeholder="Rejection reason"
+                          value={reasonMap[r._id] || ''}
+                          onChange={(e) => handleReasonChange(r._id, e.target.value)}
+                          className="custom-input bg-dark text-light border-0"
+                        />
+                        <Button
+                          variant="danger"
+                          size="sm"
+                          disabled={!reasonMap[r._id]?.trim()}
+                          onClick={() => handleStatusChange(r._id, 'reject')}
+                        >
+                          Reject
+                        </Button>
+                      </div>
                     </div>
-                  </>
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <AdminGiftCardManagement/>
-      <AdminWithdrawalApproval/>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+        <AdminGiftCardManagement />
+        <AdminWithdrawalApproval />
+      </div>
     </div>
   );
 };
