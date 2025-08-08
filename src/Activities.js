@@ -1,9 +1,9 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Spinner, Alert, Table, Button } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+// Define BASE_URL as a constant
 const BASE_URL = 'https://ugobueze-app.onrender.com';
 
 const Activities = () => {
@@ -73,6 +73,7 @@ const Activities = () => {
       className="min-vh-100 d-flex align-items-center justify-content-center"
       style={{
         background: 'linear-gradient(135deg, #2c3e50 0%, #1a202c 100%)',
+        padding: '20px',
       }}
     >
       <style>
@@ -90,14 +91,24 @@ const Activities = () => {
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 15px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            max-width: 100%;
+            width: 100%;
+            overflow: hidden;
+          }
+          .custom-table-container {
+            max-height: 60vh;
+            overflow-y: auto;
           }
           .custom-table {
             background: rgba(0, 0, 0, 0.3);
             color: #e9ecef;
+            width: 100%;
           }
           .custom-table th {
             background: rgba(255, 255, 255, 0.05);
             color: #f8f9fa;
+            position: sticky;
+            top: 0;
           }
           .custom-table td {
             border-color: rgba(255, 255, 255, 0.1);
@@ -154,26 +165,28 @@ const Activities = () => {
           {activities.length === 0 ? (
             <p className="text-light text-center">No activities found.</p>
           ) : (
-            <Table responsive className="custom-table">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Type</th>
-                  <th>Title</th>
-                  <th>Description</th>
-                </tr>
-              </thead>
-              <tbody>
-                {activities.map(activity => (
-                  <tr key={activity._id}>
-                    <td>{new Date(activity.createdAt).toLocaleString()}</td>
-                    <td>{activity.type}</td>
-                    <td>{activity.title}</td>
-                    <td>{activity.description}</td>
+            <div className="custom-table-container">
+              <Table responsive className="custom-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Title</th>
+                    <th>Description</th>
                   </tr>
-                ))}
-              </tbody>
-            </Table>
+                </thead>
+                <tbody>
+                  {activities.map(activity => (
+                    <tr key={activity._id}>
+                      <td>{new Date(activity.createdAt).toLocaleString()}</td>
+                      <td>{activity.type}</td>
+                      <td>{activity.title}</td>
+                      <td>{activity.description}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            </div>
           )}
         </div>
       )}
