@@ -106,16 +106,17 @@ const GiftCardDetails = () => {
     try {
       const headers = { 
         Authorization: `Bearer ${token}`,
-        // Content-Type is set automatically by FormData
       };
       console.log(`Submitting redemption to https://ugobueze-app.onrender.com/api/giftcards/${id}/redeem`);
       const response = await axios.post(`https://ugobueze-app.onrender.com/api/giftcards/${id}/redeem`, formData, {
         headers,
       });
 
-      setMessage(response.data.message || 'Gift card submitted for review.');
+      setMessage(`${response.data.message} Check your activities for details.`);
       setAmount('');
       setImage(null);
+      // Optionally refetch activities if you have an activities API endpoint
+      // e.g., await axios.get('https://ugobueze-app.onrender.com/api/activities', { headers });
     } catch (err) {
       console.error('Submit error:', err.response?.data || err.message);
       if (err.response?.status === 401) {
