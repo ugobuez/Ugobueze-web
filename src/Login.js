@@ -26,14 +26,17 @@ const LoginForm = () => {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || 'Login failed');
+        throw new Error(data.error || data.message || 'Login failed');
       }
 
-      // ✅ Save token(s)
+      // Save normal token for all logged-in users
       localStorage.setItem('token', data.token);
       localStorage.setItem('userToken', data.token);
 
-      if (data.user?.isAdmin) {
+      // Check if user is admin (works with either flag or role)
+      const isAdmin = data.user?.isAdmin === true || data.user?.role === 'admin';
+
+      if (isAdmin) {
         localStorage.setItem('adminToken', data.token);
         navigate('/admin/dashboard');
       } else {
@@ -81,6 +84,7 @@ const LoginForm = () => {
               value={formData.email}
               onChange={handleChange}
               disabled={loading}
+              autoComplete="email"
             />
           </div>
 
@@ -95,6 +99,7 @@ const LoginForm = () => {
               value={formData.password}
               onChange={handleChange}
               disabled={loading}
+              autoComplete="current-password"
             />
           </div>
 
@@ -102,11 +107,13 @@ const LoginForm = () => {
             {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
-  <p className="text-sm text-right mt-2">
-            <a href="/forgot-password" className="text-blue-500 hover:underline">
-              Forgot Password?
-            </a>
-          </p>
+
+        <p className="text-sm text-right mt-2">
+          <a href="/forgot-password" className="text-blue-500 hover:underline">
+            Forgot Password?
+          </a>
+        </p>
+
         <p className="text-center mt-3">
           Don’t have an account?{' '}
           <Link to="/signup" className="text-primary">
