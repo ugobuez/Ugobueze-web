@@ -12,6 +12,7 @@ import Wallet from "./Wallet";
 import Activities from "./Activities";
 import Sellgiftcard from "./Sellgiftcard";
 import Referrals from "./Referrals";
+import Forgotten from "./ForgottenPassword"
 
 // ✅ NEW: Route guards
 import ProtectedRoute from "./ProtectedRoute";
@@ -41,6 +42,7 @@ const App = () => {
         <Route path="/referrals" element={<Referrals />} />
         <Route path="/giftcard/:id" element={<GiftCardDetails />} />
         <Route path="/transactions" element={<Activities />} />
+        <Route path="/forgot-password" element={<Forgotten />} />
         {/* ✅ Protected User Routes */}
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
