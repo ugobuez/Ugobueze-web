@@ -20,7 +20,7 @@ export default function ResetPassword() {
 
     try {
       const res = await fetch(
-        "http://localhost:4500/api/users/reset-password", // ✅ Production URL
+        "https://ugobueze-app.onrender.com/api/users/reset-password", // ✅ Production URL
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
