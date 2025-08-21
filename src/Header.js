@@ -34,11 +34,7 @@ const Header = () => {
             </Button>
           </Link>
 
-          <Link to="/admin/dashboard">
-            <Button variant="white" className="rounded-pill my-3 pt-2 px-4">
-              <i className="bx fs-3"></i> Admin Dashboard ➜
-            </Button>
-          </Link>
+       
         </Nav>
       </Navbar.Collapse>
     </Navbar>
